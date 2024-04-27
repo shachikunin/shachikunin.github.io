@@ -1,0 +1,1736 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <link rel="icon" type="image/png" href="image/shachikunin_icon.png">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans|Roboto|Lato|Noto+Serif+JP|Marcellus" rel="stylesheet">
+  <title>必殺社畜人のホームページ</title>
+  <style>
+    body {
+      position: relative;
+      transition: background-color 0.5s, color 0.5s;
+      font-family: "Noto Sans JP", "ヒラギノ丸ゴ Pro","Hiragino Maru Gothic Pro","ヒラギノ角ゴ Pro W3","Hiragino Kaku Gothic Pro","HG丸ｺﾞｼｯｸM-PRO","HGMaruGothicMPRO";
+    }
+
+    .container{
+      padding: 30px 0;
+    }
+
+    .container-expand{
+      padding: 0;
+    }
+    
+    #eventSection {
+      padding-top: 56px;
+    }
+
+    .section-title h1 {
+      font-family: 'Marcellus'; /* セクション名のフォントを指定 */
+      letter-spacing: 3px
+    }
+    
+    .navbar {
+      background: linear-gradient(to right, #fc5c7d, #6a82fb);
+      background-size: 200% 100%;
+      animation: gradient 6s linear infinite;
+    }
+    @keyframes gradient {
+      0% {
+        background-position: 0% 50%;
+      }
+      50% {
+        background-position: 100% 50%;
+      }
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+    .navbar-nav {
+      margin: 0 auto;
+    }
+    .nav-item {
+      margin: 0 10px;
+    }
+    .nav-link {
+      position: relative;
+      color: #fff !important;
+    }
+    .nav-link::before {
+      content: "";
+      position: absolute;
+      top: -10px;
+      left: 0;
+      width: 100%;
+      height: 5px;
+      background-color: transparent;
+      transition: background-color 0.3s;
+    }
+    .nav-link:hover::before,
+    .nav-link.active::before {
+      background-color: #fff;
+    }
+    .section-title {
+      padding: 60px 0;
+      background-color: #e9ecef;
+      transition: background-color 0.5s;
+    }
+    .section-title h1 {
+      font-size: 42px;
+      font-weight: bold;
+      margin-bottom: 0;
+    }
+    footer {
+      padding: 30px 0;
+      background: linear-gradient(to right, #fc5c7d, #6a82fb);
+      background-size: 200% 100%;
+      animation: gradient 6s linear infinite;
+      color: #fff;
+    }
+    .social-buttons {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .social-buttons .btn {
+      margin: 0 10px;
+      transition: filter 0.3s;
+    }
+    .social-buttons .btn:hover {
+      filter: brightness(1.2);
+    }
+
+    #theme-toggle {
+      transition: background-color 0.5s;
+    }
+  
+    #theme-toggle:hover {
+      background-color: #ff9800; /* 太陽の色 */
+    }
+  
+    body.dark-mode #theme-toggle:hover {
+      background-color: #ece626; /* 月の色 */
+    }
+    
+    .dark-mode {
+      background-color: #000;
+      color: #fff;
+    }
+    .dark-mode .section-title {
+      background-color: #333;
+    }
+    #qrcode-modal .modal-content {
+      background-color: #fff;
+      color: #000;
+      border: none;
+    }
+  
+    #qrcode-modal .modal-header {
+      border-bottom: none;
+    }
+  
+    #qrcode-modal .close {
+      color: #000;
+      text-shadow: none;
+    }
+  
+    #qrcode-modal .modal-dialog {
+      transition: transform 0.5s ease;
+    }
+  
+    #qrcode-modal:not(.show) .modal-dialog {
+      transform: translateY(-100%);
+    }
+  
+    #qrcode-modal .modal-body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+  
+    @-webkit-keyframes tracking-in-expand {
+      0% {
+        letter-spacing: -0.5em;
+        opacity: 0;
+      }
+      40% {
+        opacity: 0.6;
+      }
+      100% {
+        opacity: 1;
+      }
+    }
+    @keyframes tracking-in-expand {
+      0% {
+        letter-spacing: -0.5em;
+        opacity: 0;
+      }
+      40% {
+        opacity: 0.6;
+      }
+      100% {
+        opacity: 1;
+      }
+    }
+    .tracking-in-expand {
+      opacity: 0;
+    }
+    .tracking-in-expand.animate {
+      -webkit-animation: tracking-in-expand 0.7s cubic-bezier(0.215, 0.610, 0.355, 1.000) both;
+      animation: tracking-in-expand 0.7s cubic-bezier(0.215, 0.610, 0.355, 1.000) both;
+    }
+    .youtube-thumbnail {
+      position: relative;
+      display: inline-block;
+    }
+    
+    .youtube-thumbnail img {
+      width: 320px;
+      height: 180px;
+      cursor: pointer;
+    }
+
+    #youtube-modal .modal-content {
+      background-color: #000;
+      color: #fff;
+      border: none;
+    }
+  
+    #youtube-modal .modal-header {
+      border-bottom: none;
+    }
+  
+    #youtube-modal .close {
+      color: #fff;
+      text-shadow: none;
+    }
+  
+    #youtube-modal .modal-dialog {
+      transition: transform 0.5s ease;
+    }
+  
+    #youtube-modal:not(.show) .modal-dialog {
+      transform: translateY(-100%);
+    }
+  
+    @keyframes slideDown {
+      0% {
+        transform: translateY(-100%);
+      }
+      100% {
+        transform: translateY(0);
+      }
+    }
+    
+    .play-button {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #fff;
+      font-size: 48px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    
+    .youtube-thumbnail:hover .play-button {
+      opacity: 1;
+    }
+
+    .music-apps-bg {
+      background-image: url('image/music.png');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      position: relative;
+    }
+  
+    .music-apps-bg::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: -1;
+    }
+
+    #musicSection{
+      position: relative;
+      z-index: 1;
+    }
+  
+    #musicSection::before {
+      content: "";
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+    
+    .app-thumbnail {
+      overflow: hidden;
+      position: relative;
+      display: inline-block;
+    }
+    
+    .app-thumbnail img {
+      width: 480px;
+      height: 270px;
+    }
+    
+    .app-thumbnail .banner {
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 1;
+      transition: left 0.5s, opacity 0.5s;
+      pointer-events: none;
+    }
+    
+    .app-thumbnail:hover .banner {
+      left: 0;
+      opacity: 1;
+    }
+    
+    .app-thumbnail .banner {
+      left: -100%;
+      opacity: 0;
+      transition: left 0.5s, opacity 0.5s;
+    }
+    .image-viewer {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 750px;
+      height: 500px;
+      margin: 0 auto;
+    }
+    
+    .image-container {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      height: 100%;
+    }
+    
+    .image-wrapper {
+      position: relative;
+      flex: 1;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .image-wrapper img {
+      position: absolute;
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      opacity: 0;
+      transition: opacity 0.5s;
+    }
+    
+    .image-wrapper img.active {
+      opacity: 1;
+    }
+    
+    .arrow {
+      font-size: 48px;
+      color: #000;
+      cursor: pointer;
+      user-select: none;
+      margin: 0 20px;
+    }
+
+    .dark-mode .arrow {
+      color: #fff;
+    }
+
+    /* 星空の背景のスタイル */
+    .stars {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(0deg, rgb(28, 6, 66) 20%, rgb(4, 2, 34)80%, rgb(0, 0, 0));
+      overflow: hidden;
+      opacity: 0;
+      transition: opacity 0.5s;
+      z-index: -2;
+    }
+
+    /* 星のスタイル */
+    .star {
+      position: absolute;
+      display: block;
+      background-color: #fff;
+      border-radius: 50%;
+      box-shadow: 0 0 4px 2px rgba(255, 255, 255, 0.2);
+      opacity: 0;
+      animation: twinkle 5s infinite;
+    }
+    /* 星がキラキラ光るアニメーション */
+    @keyframes twinkle {
+      0% {
+        opacity: 0;
+      }
+      50% {
+        transform: scale(1.1);
+        opacity: 1;
+      }
+      100% {
+        opacity: 0;
+        transform: scale(1);
+      }
+    }
+    .dark-mode .stars {
+      opacity: 1;
+    }
+
+    .qrcodebutton {
+      padding: 0.6em 2em;
+      border: none;
+      outline: none;
+      color: rgb(255, 255, 255);
+      background: #111;
+      cursor: pointer;
+      position: relative;
+      z-index: 0;
+      border-radius: 10px;
+    }
+    
+    .qrcodebutton:before {
+      content: "";
+      background: linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000);
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      background-size: 400%;
+      z-index: -1;
+      filter: blur(5px);
+      width: calc(100% + 4px);
+      height: calc(100% + 4px);
+      animation: glowingqrcodebutton 20s linear infinite;
+      opacity: 0;
+      transition: opacity 0.3s ease-in-out;
+      border-radius: 10px;
+    }
+    
+    @keyframes glowingqrcodebutton {
+      0% {
+        background-position: 0 0;
+      }
+      50% {
+        background-position: 400% 0;
+      }
+      100% {
+        background-position: 0 0;
+      }
+    }
+    
+    .qrcodebutton:active {
+      color: #000;
+    }
+    
+    .qrcodebutton:active:after {
+      background: transparent;
+    }
+    
+    .qrcodebutton:hover:before {
+      opacity: 1;
+    }
+    
+    .qrcodebutton:after {
+      z-index: -1;
+      content: "";
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: #191919;
+      left: 0;
+      top: 0;
+      border-radius: 10px;
+    }
+
+    .qrcodelink {
+      color: inherit;
+      text-decoration: none;
+      background:
+        linear-gradient(
+          to right,
+          rgba(100, 200, 200, 1),
+          rgba(100, 200, 200, 1)
+        ),
+        linear-gradient(
+          to right,
+          rgba(255, 0, 0, 1),
+          rgba(255, 0, 180, 1),
+          rgba(0, 100, 200, 1)
+        );
+      background-size: 100% 3px, 0 3px;
+      background-position: 100% 100%, 0 100%;
+      background-repeat: no-repeat;
+      transition: background-size 400ms;
+    }
+    
+    .qrcodelink:hover {
+      background-size: 0 3px, 100% 3px;
+      color: rgb(209, 212, 31); /* 変更: ホバー時の色を黄色に設定 */
+    }
+
+    .profile-image-wrapper {
+      position: relative;
+      width: 50%;
+      padding-top: 50%;
+      overflow: hidden;
+      border-radius: 50%;
+      opacity: 0;
+      transform: translateX(-50px);
+      transition: opacity 1s, transform 1s;
+    }
+    
+    .profile-image {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .profile-text {
+      opacity: 0;
+      transform: translateX(-50px);
+      transition: opacity 1s, transform 1s;
+      transition-delay: 0.5s;
+    }
+    
+    .profile-image-wrapper.animate {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    
+    .profile-text.animate {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .content-title {
+      position: relative;
+      padding-left: 20px;
+      margin-bottom: 30px;
+    }
+    
+    .content-title h3 {
+      font-size: 24px;
+      font-weight: bold;
+      margin: 0;
+      padding-bottom: 10px;
+      border-bottom: 2px dotted #ccc;
+    }
+    
+    .content-title::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background-color: #333;
+      transition: background-color 0.5s, box-shadow 0.5s;
+      animation: neon-off 0.5s ease-in-out;
+    }
+
+    .dark-mode .content-title::before {
+      background-color: #fff;
+      box-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #fff, 0 0 40px #ff00de, 0 0 70px #ff00de, 0 0 80px #ff00de, 0 0 100px #ff00de, 0 0 150px #ff00de;
+      animation: neon-glow 1.5s ease-in-out infinite alternate;
+    }
+
+    @keyframes neon-glow {
+      from {
+        box-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #fff, 0 0 40px #ff00de, 0 0 70px #ff00de, 0 0 80px #ff00de, 0 0 100px #ff00de, 0 0 150px #ff00de;
+      }
+      to {
+        box-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #fff, 0 0 20px #ff00de, 0 0 35px #ff00de, 0 0 40px #ff00de, 0 0 50px #ff00de, 0 0 75px #ff00de;
+      }
+    }
+    
+    @keyframes neon-off {
+      0% {
+        background-color: #fff;
+        box-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #fff, 0 0 40px #ff00de, 0 0 70px #ff00de, 0 0 80px #ff00de, 0 0 100px #ff00de, 0 0 150px #ff00de;
+      }
+      100% {
+        background-color: #333;
+        box-shadow: none;
+      }
+    }
+
+    .image-gallery {
+      margin-top: 30px;
+    }
+    
+    .gallery-image {
+      margin-bottom: 30px;
+      opacity: 0;
+      filter: blur(10px);
+      transform: translateY(50px);
+      transition: opacity 2s, filter 2s, transform 2s;
+    }
+    
+    .gallery-image.animate {
+      opacity: 1;
+      filter: blur(0);
+      transform: translateY(0);
+    }    
+
+    .gallery-item {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .gallery-item::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 90%;
+      height: 90%;
+      border: 1px solid #fff;
+      opacity: 0;
+      transition: opacity 0.5s;
+      z-index: 1;
+    }
+
+    .gallery-item:hover::before {
+      opacity: 1;
+    }
+    
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      transition: background-color 0.5s, opacity 0.5s;
+    }
+    
+    .overlay-text {
+      color: #fff;
+      font-size: 20px;
+      text-align: center;
+      opacity: 0;
+      filter: blur(10px);
+      transform: scale(3);
+      transition: opacity 0.5s, filter 0.5s, transform 0.5s;
+    }
+    
+    .gallery-item:hover .overlay {
+      background-color: rgba(0, 0, 0, 0.5);
+      opacity: 1;
+    }
+    
+    .gallery-item:hover .overlay-text {
+      opacity: 1;
+      filter: blur(0);
+      transform: scale(1);
+    }
+
+    .gallery-item:hover .gallery-image {
+      filter: blur(5px);
+      transform: scale(1.5);
+      transition: opacity 0.5s, filter 0.5s, transform 0.5s;
+    }
+    
+    .gallery-image {
+      margin-bottom: 30px;
+      opacity: 0;
+      filter: blur(10px);
+      transform: translateY(50px);
+      transition: opacity 2s, filter 2s, transform 2s;
+    }
+    
+    .gallery-image.animate {
+      opacity: 1;
+      filter: blur(0);
+      transform: translateY(0);
+    }
+
+    #galleryModal .modal-content {
+      background-color: transparent;
+      border: none;
+      box-shadow: none;
+    }
+    
+    #galleryModal .modal-header {
+      border-bottom: none;
+    }
+    
+    #galleryModal .modal-body {
+      padding: 0;
+      position: relative;
+    }
+    
+    #galleryModal .close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      color: #fff;
+      text-shadow: none;
+      opacity: 0.8;
+      z-index: 1;
+      font-size: 32px;
+      line-height: 1;
+      padding: 5px;
+      background-color: rgba(0, 0, 0, 0.5);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border: 2px solid #fff;
+      box-shadow: 0 2px 5px rgba(139, 0, 0, 0.3);
+      transition: opacity 0.3s;
+    }
+    
+    #galleryModal .close:hover {
+      opacity: 1;
+    }
+
+    #galleryModal .modal-dialog {
+      max-width: 90%;
+      max-height: 90vh;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      transition: transform 0.5s ease, opacity 0.5s ease;
+    }
+
+    #galleryModal:not(.show) .modal-dialog {
+      transform: translateY(-100%);
+      opacity: 0;
+    }
+    
+    .gallery-modal-image-container {
+      perspective: 1000px;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .gallery-modal-image {
+      max-width: 100%;
+      max-height: 70vh;
+      object-fit: contain;
+      transition: filter 1s cubic-bezier(1, 0, 0, 1);
+    }
+    
+    .gallery-modal-image-wrapper.flipped .gallery-modal-image {
+      filter: contrast(120%) sepia(80%) blur(3px);
+    }
+    
+    .gallery-modal-image-back {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      transform: rotateY(180deg);
+      backface-visibility: hidden;
+      background: radial-gradient(transparent, rgba(0, 0, 0, 0.5)) fixed;
+      background-repeat: no-repeat;
+      background-blend-mode: multiply;
+      background-size: cover;
+      padding: 20px;
+      color: #fff;
+      text-align: right;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-end;
+    }
+    
+    .gallery-modal-image-wrapper {
+      position: relative;
+      transition: transform 1s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      transform-style: preserve-3d;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .gallery-modal-image-wrapper .click-me {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: rgba(242, 159, 35, 0.5);
+      
+      background-blend-mode: screen;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 5px;
+      opacity: 0;
+      transition: opacity 0.7s;
+      pointer-events: none;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
+    }
+    
+    .gallery-modal-image-wrapper:hover .click-me {
+      opacity: 1;
+    }
+    
+    .gallery-modal-image-wrapper.flipped:hover .click-me {
+      opacity: 0;
+    }
+    
+    .gallery-modal-image-wrapper.flipped {
+      transform: rotateY(180deg);
+    }
+    
+    .gallery-modal-image-wrapper.flipped.back {
+      transform: rotateY(0deg);
+    }
+
+    .gallery-modal-title {
+      font-size: 24px;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    }
+    
+    .gallery-modal-description {
+      font-size: 16px;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    }
+
+    #loading {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #0b100e;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+    
+    .spinner {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: conic-gradient(#ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3);
+      -webkit-mask: radial-gradient(farthest-side,#0000 calc(100% - 1px),#000 0);
+      animation: spin 1s linear infinite, glow 1s cubic-bezier(0,1.01,.27,1) infinite alternate;
+      margin-bottom: 20px;
+    }
+    
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+    
+    @keyframes glow {
+      0% {
+        box-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #fff, 0 0 40px #ff00de, 0 0 70px #ff00de, 0 0 80px #ff00de, 0 0 100px #ff00de, 0 0 150px #ff00de;
+      }
+      100% {
+        box-shadow: 0 0 20px #fff, 0 0 40px #fff, 0 0 60px #fff, 0 0 80px #ff00de, 0 0 140px #ff00de, 0 0 160px #ff00de, 0 0 200px #ff00de, 0 0 300px #ff00de;
+      }
+    }
+    
+    
+    .loading-text {
+      color: #fff;
+      font-size: 80px;
+      opacity: 0;
+      animation: fadeInOut 2s ease-in-out forwards;
+    }
+    
+    @keyframes fadeInOut {
+      0% {
+        opacity: 0;
+        transform: scale(3) blur(5);
+      }
+      50% {
+        opacity: 0.8;
+        transform: scale(2) blur(2);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1) blur(0);
+        font-size: 24px;
+      }
+    }
+    
+
+  </style>
+</head>
+<body data-spy="scroll" data-target="#navbar" data-offset="80">
+  <div id="loading">
+    <div class="spinner"></div>
+    <div class="loading-text">まもなくです。</div>
+  </div>
+  <div class="stars"></div>
+  
+  <nav id="navbar" class="navbar navbar-expand-lg navbar-dark fixed-top">
+    
+    <div class="container" style="padding: 0;">
+      <a class="navbar-brand" href="#">ホームページ</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link" href="#eventSection">EVENTS</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#gallerySection">GALLERY</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#musicSection">MUSIC</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#appsSection">APPS</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#gameSection">GAMES</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#profileSection">PROFILE</a>
+          </li>
+        </ul>
+      </div>
+      <button id="theme-toggle" class="btn btn-light"><i class="fas fa-sun"></i></button>
+    </div>
+  </nav>
+
+  <section id="eventSection">
+    <div class="section-title">
+      <div class="container" style="padding: 0;">
+        <h1 class="tracking-in-expand">EVENTS</h1>
+      </div>
+    </div>
+    <div class="container">
+      <p>過去のサークル参加イベント情報を掲載しています。</p>
+      <p id="image-title" style="text-align: center; font-size: 18px; font-weight: bold; margin: 0;"></p>
+      <div class="image-viewer">
+        <div id="prev-button" class="arrow left-arrow">&lt;</div>
+        <div class="image-wrapper">
+          <img id="current-image" class="active" src="image/お品書き_comic1_24.png" alt="Image 1">
+          <img id="next-image" src="image/お品書き_comike_101.png" alt="Image 2">
+        </div>
+        <div id="next-button" class="arrow right-arrow">&gt;</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="gallerySection">
+    <div class="section-title">
+      <div class="container" style="padding: 0;">
+        <h1 class="tracking-in-expand">GALLERY</h1>
+      </div>
+    </div>
+    <div class="container">
+      <p>これまで制作したデジタルイラストの一部を掲載しています。</p>
+      <div class="row image-gallery">
+        <!-- Dropboxの埋め込みコードをここに追加。-->
+        <!-- 「www.dropbox.com」を「dl.dropboxusercontent.com」に変更 -->
+        <!-- 「?dl=0」を削除-->
+        <div class="col-md-4">
+          <div class="gallery-item">
+            <img src="https://dl.dropboxusercontent.com/scl/fi/fx37075ffttc3gapqunq5/illust_1.png?rlkey=459g5lh3xwv8nuau98axcmrd7" alt="Gaur Gura" class="img-fluid gallery-image" data-description="Hololive EN Member/Vtuber">
+            <div class="overlay">
+              <div class="overlay-text">拡大表示する</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="gallery-item">
+            <img src="https://dl.dropboxusercontent.com/scl/fi/tt171nwwy6ajo5lqdvbgw/illust_2.png?rlkey=rnystkc99r4nbv3y5ujlypd4e" alt="Choco Kuki" class="img-fluid gallery-image" data-description="Original Character">
+            <div class="overlay">
+              <div class="overlay-text">拡大表示する</div>
+            </div>
+          </div>
+          
+        </div>
+        <div class="col-md-4">
+          <div class="gallery-item">
+            <img src="https://dl.dropboxusercontent.com/scl/fi/ob6zs14p7j7513razi80k/illust_3.png?rlkey=lewmpw6r275pd2aq8gxd7j68p" alt="Ui Shigure" class="img-fluid gallery-image" data-description="Illustrator/Vtuber">
+            <div class="overlay">
+              <div class="overlay-text">拡大表示する</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="gallery-item">
+            <img src="https://dl.dropboxusercontent.com/scl/fi/tfuxv5tok7qehheog80u4/illust_4.png?rlkey=dwup43whl6ntotie0yp2ogbq0" alt="Choco Kuki" class="img-fluid gallery-image" data-description="Original Character">
+            <div class="overlay">
+              <div class="overlay-text">拡大表示する</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="gallery-item">
+            <img src="https://dl.dropboxusercontent.com/scl/fi/yid6kkx3rw2ehm648cnkd/illust_5.png?rlkey=uwollvz2l6fehcnd49rhr51mp" alt="Suisei Hoshimachi" class="img-fluid gallery-image" data-description="Hololive JP Member/Vtuber">
+            <div class="overlay">
+              <div class="overlay-text">拡大表示する</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="gallery-item">
+            <img src="https://dl.dropboxusercontent.com/scl/fi/7md574q73a7nsvr0v69le/illust_6.png?rlkey=7j4con7o82jjn0sky6hxr5782" alt="Pekora Usada" class="img-fluid gallery-image" data-description="Hololive JP Member/Vtuber">
+            <div class="overlay">
+              <div class="overlay-text">拡大表示する</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- モーダルウィンドウのHTML -->
+    <div class="modal fade" id="galleryModal" tabindex="-1" role="dialog" aria-labelledby="galleryModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-body">
+            <div class="gallery-modal-image-container">
+              <div class="gallery-modal-image-wrapper" style="font-family: 'Marcellus';">
+                <img src="" alt="Gallery Image" class="img-fluid gallery-modal-image">
+                <div class="click-me">Click Me!</div>
+                <div class="gallery-modal-image-back">
+                  <h4 class="gallery-modal-title"></h4>
+                  <p class="gallery-modal-description"></p>
+                </div>
+              </div>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <section id="musicSection" class="music-apps-bg">
+    <div class="section-title">
+      <div class="container" style="padding: 0;">
+        <h1 class="tracking-in-expand">MUSIC</h1>
+      </div>
+    </div>
+    
+    <div class="container" style="color: #fff;">
+      <p>これまで作曲した楽曲の一部を掲載しています。</p>
+        <iframe width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1431428830&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"></iframe><div style="font-size: 10px; color: #cccccc;line-break: anywhere;word-break: normal;overflow: hidden;white-space: nowrap;text-overflow: ellipsis; font-family: Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif;font-weight: 100;"><a href="https://soundcloud.com/swugj2gjxfum" title="必殺社畜人" target="_blank" style="color: #cccccc; text-decoration: none;">必殺社畜人</a> · <a href="https://soundcloud.com/swugj2gjxfum/midnight-rain" title="Midnight Rain" target="_blank" style="color: #cccccc; text-decoration: none;">Midnight Rain</a></div>
+        <iframe width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1455726349&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"></iframe><div style="font-size: 10px; color: #cccccc;line-break: anywhere;word-break: normal;overflow: hidden;white-space: nowrap;text-overflow: ellipsis; font-family: Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif;font-weight: 100;"><a href="https://soundcloud.com/swugj2gjxfum" title="必殺社畜人" target="_blank" style="color: #cccccc; text-decoration: none;">必殺社畜人</a> · <a href="https://soundcloud.com/swugj2gjxfum/yfdoe3adewfm" title="まだ起きたくない" target="_blank" style="color: #cccccc; text-decoration: none;">まだ起きたくない</a></div>
+        <iframe width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1500812308&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"></iframe><div style="font-size: 10px; color: #cccccc;line-break: anywhere;word-break: normal;overflow: hidden;white-space: nowrap;text-overflow: ellipsis; font-family: Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif;font-weight: 100;"><a href="https://soundcloud.com/swugj2gjxfum" title="必殺社畜人" target="_blank" style="color: #cccccc; text-decoration: none;">必殺社畜人</a> · <a href="https://soundcloud.com/swugj2gjxfum/c1py9yhyglzw" title="抱擁の光" target="_blank" style="color: #cccccc; text-decoration: none;">抱擁の光</a></div>
+        <iframe width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1504611472&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"></iframe><div style="font-size: 10px; color: #cccccc;line-break: anywhere;word-break: normal;overflow: hidden;white-space: nowrap;text-overflow: ellipsis; font-family: Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif;font-weight: 100;"><a href="https://soundcloud.com/swugj2gjxfum" title="必殺社畜人" target="_blank" style="color: #cccccc; text-decoration: none;">必殺社畜人</a> · <a href="https://soundcloud.com/swugj2gjxfum/performance-time" title="Performance Time" target="_blank" style="color: #cccccc; text-decoration: none;">Performance Time</a></div>
+        <iframe width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1510336198&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"></iframe><div style="font-size: 10px; color: #cccccc;line-break: anywhere;word-break: normal;overflow: hidden;white-space: nowrap;text-overflow: ellipsis; font-family: Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif;font-weight: 100;"><a href="https://soundcloud.com/swugj2gjxfum" title="必殺社畜人" target="_blank" style="color: #cccccc; text-decoration: none;">必殺社畜人</a> · <a href="https://soundcloud.com/swugj2gjxfum/nlx1lnodezde" title="散歩でもする？" target="_blank" style="color: #cccccc; text-decoration: none;">散歩でもする？</a></div>
+        <iframe width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1578908935&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"></iframe><div style="font-size: 10px; color: #cccccc;line-break: anywhere;word-break: normal;overflow: hidden;white-space: nowrap;text-overflow: ellipsis; font-family: Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif;font-weight: 100;"><a href="https://soundcloud.com/swugj2gjxfum" title="必殺社畜人" target="_blank" style="color: #cccccc; text-decoration: none;">必殺社畜人</a> · <a href="https://soundcloud.com/swugj2gjxfum/modern-church" title="Modern Church" target="_blank" style="color: #cccccc; text-decoration: none;">Modern Church</a></div>
+        <iframe width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1713647850&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"></iframe><div style="font-size: 10px; color: #cccccc;line-break: anywhere;word-break: normal;overflow: hidden;white-space: nowrap;text-overflow: ellipsis; font-family: Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif;font-weight: 100;"><a href="https://soundcloud.com/swugj2gjxfum" title="必殺社畜人" target="_blank" style="color: #cccccc; text-decoration: none;">必殺社畜人</a> · <a href="https://soundcloud.com/swugj2gjxfum/mjhb6kbtdpuw" title="まったり" target="_blank" style="color: #cccccc; text-decoration: none;">まったり</a></div>
+        <p>「超DTM部 感想交換会コンピ vol.1」にて参加した曲がアルバムのNo.7に収録されています！</p>
+        <div class="youtube-thumbnail">
+          <img src="https://img.youtube.com/vi/GmBdagYANdo/mqdefault.jpg" alt="YouTube Thumbnail" class="img-thumbnail" data-toggle="modal" data-target="#youtube-modal" data-video-url="https://www.youtube.com/embed/GmBdagYANdo">
+          <div class="play-button" data-toggle="modal" data-target="#youtube-modal" data-video-url="https://www.youtube.com/embed/GmBdagYANdo">
+            <i class="fas fa-play-circle"></i>
+          </div>
+        </div>
+        <div class="mt-3">
+          <button id="generate-qrcode-superdtm-album-no1" class="btn btn-primary mr-2 qrcodebutton" data-url="https://superdtmclub.booth.pm/items/4478575">QRコード生成</button>
+          <a href="https://superdtmclub.booth.pm/items/4478575" target="_blank"class="qrcodelink">Boothに移動する</a>
+        </div>
+    </div>
+  </section>
+
+  <section id="appsSection">
+    <div class="section-title">
+      <div class="container" style="padding: 0;">
+        <h1 class="tracking-in-expand">APPS</h1>
+      </div>
+    </div>
+    <div class="container">
+      <p>これまで制作したアプリの一部を掲載しています。</p>
+      <div class="content-title">
+        <h3>写真で一曲</h3>
+      </div>
+      <div class="youtube-thumbnail">
+        <img src="https://img.youtube.com/vi/AXCHYxca_J4/mqdefault.jpg" alt="YouTube Thumbnail" class="img-thumbnail" data-toggle="modal" data-target="#youtube-modal" data-video-url="https://youtu.be/AXCHYxca_J4">
+        <div class="play-button" data-toggle="modal" data-target="#youtube-modal" data-video-url="https://www.youtube.com/embed/AXCHYxca_J4">
+          <i class="fas fa-play-circle"></i>
+        </div>
+      </div>
+      <div class="mt-3">
+        <button id="generate-qrcode-app-composingoogiri" class="btn btn-primary mr-2 qrcodebutton" data-url="https://composingoogiri.streamlit.app/">QRコード生成</button>
+        <a href="https://composingoogiri.streamlit.app/" target="_blank" class="qrcodelink">アプリに移動する</a>
+      </div>
+      <p>
+        楽曲制作をするとき、インスピレーションが湧かないってことよくありませんか？<br>
+        このアプリを使えば、単語や文章から画像生成ができます。<br>
+        さらに、画像からAIがコード進行も提案してくれます。<br>
+        提案されたコード進行は、その場で試聴できるうえに、MIDIファイルを自動生成するので、<br>
+        お使いのソフトに取り込んで楽曲に使用できます。
+      </p>
+      <div class="content-title">
+        <h3>イラスト添削アプリ</h3>
+      </div>
+      <div class="mt-3">
+        <button id="generate-qrcode-illustrationcorrection" class="btn btn-primary mr-2 qrcodebutton" data-url="https://illustrationcorrection.streamlit.app/">QRコード生成</button>
+        <a href="https://illustrationcorrection.streamlit.app/" target="_blank" class="qrcodelink">アプリに移動する</a>
+      </div>
+      <p>
+        画像ファイルをアップロードすると、そのイラストをAIが褒めてくれたり、よりよくするためのアドバイスを教えてくれます。<br>
+        お好みのAIに合わせてアドバイスがもらえます。
+      </p>
+      <div class="content-title">
+        <h3>AIこよりからの挑戦状　～水平思考クイズ～</h3>
+      </div>
+      <div class="youtube-thumbnail">
+        <img src="https://img.youtube.com/vi/GDShvB9FzOU/mqdefault.jpg" alt="YouTube Thumbnail" class="img-thumbnail" data-toggle="modal" data-target="#youtube-modal" data-video-url="https://youtu.be/GDShvB9FzOU">
+        <div class="play-button" data-toggle="modal" data-target="#youtube-modal" data-video-url="https://www.youtube.com/embed/GDShvB9FzOU">
+          <i class="fas fa-play-circle"></i>
+        </div>
+      </div>
+      <div class="mt-3">
+        <button id="generate-qrcode-lateralthinkingquizwithai" class="btn btn-primary mr-2 qrcodebutton" data-url="https://lateralthinkingquizwithai.streamlit.app/">QRコード生成</button>
+        <a href="https://lateralthinkingquizwithai.streamlit.app/" target="_blank" class="qrcodelink">アプリに移動する</a>
+      </div>
+      <p>
+        博衣こよりさんの「AIこより」と、同じく博衣こよりさん発案の企画「ホロのウミガメ」を合わせたアプリです。<br>
+        AIがウミガメのスープと呼ばれる水平思考ゲームの問題を出題するので、はいかいいえで答えられる質問をして真相を明かしましょう。<br>
+        AIとプレイヤーの1対1だけじゃなくて、CPU対戦も可能です。
+      </p>
+      <div class="content-title">
+        <h3>カレンダー生成</h3>
+      </div>
+      <div class="mt-3">
+        <button id="generate-qrcode-makecalendarwithstreamllit" class="btn btn-primary mr-2 qrcodebutton" data-url="https://makecalendarwithstreamllit.streamlit.app/">QRコード生成</button>
+        <a href="https://makecalendarwithstreamllit.streamlit.app/" target="_blank" class="qrcodelink">アプリに移動する</a>
+      </div>
+      <p>
+        画像生成AIを使って、カレンダーの絵柄を自由に作成してカレンダーを作れます。
+      </p>
+      <div class="content-title">
+        <h3>youtube切抜き動画作成支援アプリ</h3>
+      </div>
+      <div class="mt-3">
+        <button id="generate-qrcode-youtubeclipsupport" class="btn btn-primary mr-2 qrcodebutton" data-url="https://shachikunin-youtubeclipsupport-clipsupport-3kem4a.streamlit.app/">QRコード生成</button>
+        <a href="https://shachikunin-youtubeclipsupport-clipsupport-3kem4a.streamlit.app/" target="_blank" class="qrcodelink">アプリに移動する</a>
+      </div>
+      <p>
+        Youtubeのライブ配信を分析して、配信の盛り上がった部分を可視化することで切り抜き動画を作りやすくします。
+      </p>
+      
+      <div class="content-title">
+        <h3>NEEDY GIRL OVERDOSEに出てくるLINE風の画面を再現してみた（動画のみ）</h3>
+      </div>
+      <div class="youtube-thumbnail">
+        <img src="https://img.youtube.com/vi/CS-ll1bvhyo/mqdefault.jpg" alt="YouTube Thumbnail" class="img-thumbnail" data-toggle="modal" data-target="#youtube-modal" data-video-url="https://www.youtube.com/embed/CS-ll1bvhyo">
+        <div class="play-button" data-toggle="modal" data-target="#youtube-modal" data-video-url="https://www.youtube.com/embed/CS-ll1bvhyo">
+          <i class="fas fa-play-circle"></i>
+        </div>
+      </div>
+      <p>NEEDY GIRL OVERDOSE内に登場するLINE風の画面を、実際にスタンプも発売されたことで実現できると思い、LINEbotを作成しました。</p>
+      <div class="content-title">
+        <h3>ガチャポン</h3>
+      </div>
+      <div class="app-thumbnail">
+        <a href="gachapon.html">
+          <img src="image/gachapon.png" alt="Gachapon" class="img-fluid">
+          <div class="banner">クリックでアプリを試す</div>
+        </a>
+      </div>
+      <p>コインを入れてハンドルを回すと、ガチャポンが出てきます。君の運勢を占おう。</p>
+      <div class="content-title">
+        <h3>Apple風のスクリーンセーバー</h3>
+      </div>
+      <div class="app-thumbnail">
+        <a href="screen_saver.html">
+          <img src="image/goto_screen_saver.png" alt="Screen Saver" class="img-fluid">
+          <div class="banner">クリックでアプリを試す</div>
+        </a>
+      </div>
+      <p>Apple風のスクリーンセーバーです。カラフルなパーティクルがこちらに向かって、もしくは飛んでいきます。</p>
+
+    </div>
+  </section>
+  
+  <!-- YouTube Modal -->
+  <div class="modal fade" id="youtube-modal" tabindex="-1" role="dialog" aria-labelledby="youtube-modal-label" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="youtube-modal-label">YouTube Video</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="embed-responsive embed-responsive-16by9">
+            <iframe class="embed-responsive-item" src="" allowfullscreen></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section id="gameSection">
+    <div class="section-title">
+      <div class="container" style="padding: 0;">
+        <h1 class="tracking-in-expand">GAMES</h1>
+      </div>
+    </div>
+    <div class="container">
+      <p>これまで制作したゲームの一部を掲載しています。(一部ダウンロードも可能)</p>
+      <div class="content-title">
+        <h3>博衣こよりの絶叫だけで神経衰弱してみた</h3>
+      </div>
+      <div class="youtube-thumbnail">
+        <img src="https://img.youtube.com/vi/kz5IVneLWSI/mqdefault.jpg" alt="YouTube Thumbnail" class="img-thumbnail" data-toggle="modal" data-target="#youtube-modal" data-video-url="https://youtu.be/kz5IVneLWSI">
+        <div class="play-button" data-toggle="modal" data-target="#youtube-modal" data-video-url="https://www.youtube.com/embed/kz5IVneLWSI">
+          <i class="fas fa-play-circle"></i>
+        </div>
+      </div>
+      <div class="mt-3">
+        <button id="generate-qrcode-koyoshout" class="btn btn-primary mr-2 qrcodebutton" data-url="https://drive.google.com/file/d/1-tZpqzQaQlt8vzOGAyfpNnWul29wQ4RQ/view">QRコード生成</button>
+        <a href="https://drive.google.com/file/d/1-tZpqzQaQlt8vzOGAyfpNnWul29wQ4RQ/view" target="_blank" class="qrcodelink">ゲームのダウンロードはこちら</a>
+      </div>
+      <p>
+        博衣こよりさんの絶叫を集めて、声で神経衰弱ができるゲームを作りました。<br>
+        基本的にずっと絶叫を聴くことになるので、耳にダメージが入らないように休みながらプレイすることを推奨します。
+      </p>
+      <p>[2024/04/02] 声ネタの主である博衣こよりさんにゲームを配信していただきました！<br>↓アーカイブはこちら↓</p>
+      <div class="youtube-thumbnail">
+        <img src="https://img.youtube.com/vi/lU76Me5mtjA/mqdefault.jpg" alt="YouTube Thumbnail" class="img-thumbnail" data-toggle="modal" data-target="#youtube-modal" data-video-url="https://www.youtube.com/embed/lU76Me5mtjA">
+        <div class="play-button" data-toggle="modal" data-target="#youtube-modal" data-video-url="https://www.youtube.com/embed/lU76Me5mtjA">
+          <i class="fas fa-play-circle"></i>
+        </div>
+      </div>
+      <div class="content-title">
+        <h3>ういビームだけで神経衰弱してみた</h3>
+      </div>
+      <div class="youtube-thumbnail">
+        <img src="https://img.youtube.com/vi/kF_PLwdPMdE/mqdefault.jpg" alt="YouTube Thumbnail" class="img-thumbnail" data-toggle="modal" data-target="#youtube-modal" data-video-url="https://youtu.be/kF_PLwdPMdE">
+        <div class="play-button" data-toggle="modal" data-target="#youtube-modal" data-video-url="https://www.youtube.com/embed/kF_PLwdPMdE">
+          <i class="fas fa-play-circle"></i>
+        </div>
+      </div>
+      <div class="mt-3">
+        <button id="generate-qrcode-uibeam" class="btn btn-primary mr-2 qrcodebutton" data-url="https://drive.google.com/file/d/1EKLlLl31eqIUUfGRFJg4jC5ACrWpAKNw/view">QRコード生成</button>
+        <a href="https://drive.google.com/file/d/1EKLlLl31eqIUUfGRFJg4jC5ACrWpAKNw/view" target="_blank" class="qrcodelink">ゲームのダウンロードはこちら</a>
+      </div>
+      <p>
+        しぐれういさんなどのういビーム発言を集めて、声で神経衰弱ができるゲームを作りました。<br>
+        本人の発言が少なかったため、ホロメンからいくつか抽出して混ぜ合わせてます。
+      </p>
+      <div class="content-title">
+        <h3>博衣こよりの絶叫だけでもぐら叩きしてみた</h3>
+      </div>
+      <div class="youtube-thumbnail">
+        <img src="https://img.youtube.com/vi/de5eCdSAQkc/mqdefault.jpg" alt="YouTube Thumbnail" class="img-thumbnail" data-toggle="modal" data-target="#youtube-modal" data-video-url="https://youtu.be/de5eCdSAQkc">
+        <div class="play-button" data-toggle="modal" data-target="#youtube-modal" data-video-url="https://www.youtube.com/embed/de5eCdSAQkc">
+          <i class="fas fa-play-circle"></i>
+        </div>
+      </div>
+      <div class="mt-3">
+        <button id="generate-qrcode-koyoshout2" class="btn btn-primary mr-2 qrcodebutton" data-url="https://drive.google.com/file/d/1qqtWO7MK9ZlMBZzwvQW4zUS-5TQxCt4i/view">QRコード生成</button>
+        <a href="https://drive.google.com/file/d/1qqtWO7MK9ZlMBZzwvQW4zUS-5TQxCt4i/view" target="_blank" class="qrcodelink">ゲームのダウンロードはこちら</a>
+      </div>
+      <p>
+        博衣こよりさんの絶叫を集めて、もぐら叩きができるゲームを作りました。<br>
+        「博衣こよりの絶叫だけで神経衰弱してみた」以上にうるさい内容になっているので、ボリューム調整は必ず行ってください。
+      </p>
+      <div class="content-title">
+        <h3>姫森ルーナの暴言・キレ芸で神経衰弱してみた</h3>
+      </div>
+      <div class="youtube-thumbnail">
+        <img src="https://img.youtube.com/vi/0lucyRR8hcI/mqdefault.jpg" alt="YouTube Thumbnail" class="img-thumbnail" data-toggle="modal" data-target="#youtube-modal" data-video-url="https://youtu.be/0lucyRR8hcI">
+        <div class="play-button" data-toggle="modal" data-target="#youtube-modal" data-video-url="https://www.youtube.com/embed/0lucyRR8hcI">
+          <i class="fas fa-play-circle"></i>
+        </div>
+      </div>
+      <div class="mt-3">
+        <button id="generate-qrcode-lunaangry" class="btn btn-primary mr-2 qrcodebutton" data-url="https://drive.google.com/file/d/1KgeZ4cVEU5pOqDyHvg4h8qpKEFKT2VN8/view">QRコード生成</button>
+        <a href="https://drive.google.com/file/d/1KgeZ4cVEU5pOqDyHvg4h8qpKEFKT2VN8/view" target="_blank" class="qrcodelink">ゲームのダウンロードはこちら</a>
+      </div>
+      <p>
+        姫森ルーナさんの暴言やキレ芸を集めて、声で神経衰弱ができるゲームを作りました。<br>
+        声とは裏腹に、キレッキレの発言は思わず笑顔になること間違いなし。
+      </p>
+      <div class="content-title">
+        <h3>ブロック崩し(fubuki fox memes)</h3>
+      </div>
+      <div class="youtube-thumbnail">
+        <img src="https://img.youtube.com/vi/QeG-VwUmqgQ/mqdefault.jpg" alt="YouTube Thumbnail" class="img-thumbnail" data-toggle="modal" data-target="#youtube-modal" data-video-url="https://youtu.be/QeG-VwUmqgQ">
+        <div class="play-button" data-toggle="modal" data-target="#youtube-modal" data-video-url="https://www.youtube.com/embed/QeG-VwUmqgQ">
+          <i class="fas fa-play-circle"></i>
+        </div>
+      </div>
+      <p>
+        一時期流行った猫ミームには、ブロック崩しと合わせた動画が流行った時期がありました。<br>
+        そんなとき、白上フブキさんによるfubuki fox memesの素材が投稿されたことで、軽く作ってみました。
+      </p>
+    </div>
+  </section>
+
+  <section id="profileSection">
+    <div class="section-title">
+      <div class="container" style="padding: 0;">
+        <h1 class="tracking-in-expand">PROFILE</h1>
+      </div>
+    </div>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4">
+          <div class="profile-image-wrapper">
+            <img src="image/shachikunin_icon.png" alt="プロフィール画像" class="img-fluid rounded-circle profile-image">
+          </div>
+        </div>
+        <div class="col-md-8">
+          <div class="profile-text">
+            <h2>必殺社畜人</h2>
+            <p>デジタルイラスト、作編曲、プログラミングを主に行っています。</p>
+            <h3>＊スキル</h3>
+            <ul>
+              <li>デジタルイラスト(Clip Studio,Photoshop)</li>
+              <li>DTM(Cubase 12)</li>
+              <li>プログラミング(C,Python)</li>
+              <li>動画編集(AviUtl)</li>
+            </ul>
+            <h3>＊連絡先</h3>
+            <p>
+              基本的には、ご連絡はメールアドレス(
+              <i class="fas fa-envelope"></i> hissatsushachikunin@gmail.com
+              )からお願いします。<br>
+              各SNSのリンクは、画面下部のアイコンから移動できます。<br>
+              ※ご依頼、ご相談等は、スケジュールにより返信までお時間いただくことがあります。<br>
+              できる限り返信致しますので、お気軽にお問い合わせください。
+            </p>
+            <a class="twitter-timeline" data-height="600" href="https://twitter.com/Jblx_xldLo0?ref_src=twsrc%5Etfw">Tweets by Jblx_xldLo0</a> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container" style="padding: 0;">
+      <div class="social-buttons">
+        <a href="https://twitter.com/Jblx_xldLo0" target="_blank" class="btn btn-primary"><i class="fab fa-twitter"></i> Twitter</a>
+        <a href="https://www.youtube.com/channel/UC_Yp5JypFJMJwsKDf_jzoaw" target="_blank" class="btn btn-danger"><i class="fab fa-youtube"></i> YouTube</a>
+        <a href="https://www.pixiv.net/users/43712965" target="_blank" class="btn btn-info"><i class="fab fa-pixiv"></i> Pixiv</a>
+        <a href="https://github.com/shachikunin" target="_blank" class="btn btn-dark"><i class="fab fa-github"></i> GitHub</a>
+        <a href="https://soundcloud.com/swugj2gjxfum" target="_blank" class="btn btn-warning"><i class="fab fa-soundcloud"></i> SoundCloud</a>
+      </div>
+      <p class="text-center">&copy; 2024 All Rights Reserved.</p>
+    </div>
+  </footer>
+  <div id="qrcode-modal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">QRコード</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div id="qrcode"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+      <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script> 
+      <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script> 
+      <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script> 
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script> 
+      <script> 
+        $(window).on('load', function() {
+          setTimeout(function() {
+            $('#loading').fadeOut('slow', function() {
+              $(this).remove();
+            });
+          }, 3000); // 3秒後にローディング画面を非表示にする
+        });
+        const stars = document.querySelector('.stars');
+        let scrollPosition = window.pageYOffset;
+
+        $(document).ready(function() {
+          $('a.nav-link').on('click', function(event) {
+            if (this.hash !== '') {
+              event.preventDefault();
+              var hash = this.hash;
+              var targetOffset = $(hash).offset().top - 56;
+              $('html, body').animate({
+                scrollTop: targetOffset
+              }, 800, function() {
+                window.location.hash = hash + 20;
+              });
+            }
+        
+          });
+      $('#theme-toggle').on('click', function() { 
+        $('body').toggleClass('dark-mode'); 
+        if ($('body').hasClass('dark-mode')) { 
+          $(this).html('<i class="fas fa-moon"></i>'); 
+          scrollPosition = window.pageYOffset;
+          $('.stars').css('opacity', 1 - 0.000005 * scrollPosition);
+        } 
+        else { 
+          $(this).html('<i class="fas fa-sun"></i>'); 
+          $('.stars').css('opacity', 0);
+        } 
+      }); 
+
+      $('#generate-qrcode-superdtm-album-no1').on('click', function() {
+        var url = $(this).data('url');
+        $('#qrcode').empty();
+        new QRCode('qrcode', {
+          text: url,
+          width: 200,
+          height: 200
+        });
+        $('#qrcode-modal').modal('show');
+      });
+      $('#generate-qrcode-app-composingoogiri').on('click', function() {
+        var url = $(this).data('url');
+        $('#qrcode').empty();
+        new QRCode('qrcode', {
+          text: url,
+          width: 200,
+          height: 200
+        });
+        $('#qrcode-modal').modal('show');
+      });
+      $('#generate-qrcode-koyoshout').on('click', function() {
+        var url = $(this).data('url');
+        $('#qrcode').empty();
+        new QRCode('qrcode', {
+          text: url,
+          width: 200,
+          height: 200
+        });
+        $('#qrcode-modal').modal('show');
+      });
+      $('#generate-qrcode-uibeam').on('click', function() {
+        var url = $(this).data('url');
+        $('#qrcode').empty();
+        new QRCode('qrcode', {
+          text: url,
+          width: 200,
+          height: 200
+        });
+        $('#qrcode-modal').modal('show');
+      });
+      $('#generate-qrcode-koyoshout2').on('click', function() {
+        var url = $(this).data('url');
+        $('#qrcode').empty();
+        new QRCode('qrcode', {
+          text: url,
+          width: 200,
+          height: 200
+        });
+        $('#qrcode-modal').modal('show');
+      });
+      $('#generate-qrcode-lunaangry').on('click', function() {
+        var url = $(this).data('url');
+        $('#qrcode').empty();
+        new QRCode('qrcode', {
+          text: url,
+          width: 200,
+          height: 200
+        });
+        $('#qrcode-modal').modal('show');
+      });
+      $('#generate-qrcode-illustrationcorrection').on('click', function() {
+        var url = $(this).data('url');
+        $('#qrcode').empty();
+        new QRCode('qrcode', {
+          text: url,
+          width: 200,
+          height: 200
+        });
+        $('#qrcode-modal').modal('show');
+      });
+      $('#generate-qrcode-lateralthinkingquizwithai').on('click', function() {
+        var url = $(this).data('url');
+        $('#qrcode').empty();
+        new QRCode('qrcode', {
+          text: url,
+          width: 200,
+          height: 200
+        });
+        $('#qrcode-modal').modal('show');
+      });
+      $('#generate-qrcode-makecalendarwithstreamllit').on('click', function() {
+        var url = $(this).data('url');
+        $('#qrcode').empty();
+        new QRCode('qrcode', {
+          text: url,
+          width: 200,
+          height: 200
+        });
+        $('#qrcode-modal').modal('show');
+      });
+      $('#generate-qrcode-youtubeclipsupport').on('click', function() {
+        var url = $(this).data('url');
+        $('#qrcode').empty();
+        new QRCode('qrcode', {
+          text: url,
+          width: 200,
+          height: 200
+        });
+        $('#qrcode-modal').modal('show');
+      });
+  
+      $('#qrcode-modal').on('hide.bs.modal', function() {
+        $(this).addClass('modal-hiding');
+        setTimeout(function() {
+          $('#qrcode-modal').removeClass('modal-hiding');
+        }, 500);
+
+      });
+      
+      $('#youtube-modal').on('hidden.bs.modal', function() {
+        $(this).find('iframe').attr('src', '');
+      });
+  
+      $('#youtube-modal').on('show.bs.modal', function(event) {
+        var button = $(event.relatedTarget);
+        var videoUrl;
+        
+        if (button.hasClass('play-button')) {
+          videoUrl = button.data('video-url');
+        } else {
+          videoUrl = button.closest('.youtube-thumbnail').find('img').data('video-url');
+        }
+        
+        $(this).find('iframe').attr('src', videoUrl);
+      });
+  
+      $('#youtube-modal').on('hide.bs.modal', function() {
+        $(this).addClass('modal-hiding');
+        setTimeout(function() {
+          $('#youtube-modal').removeClass('modal-hiding');
+        }, 500);
+      });
+        }); 
+
+        const images = [
+          { url: 'image/お品書き_comic1_24.png', title: 'Comic☆1 24' },
+          { url: 'image/お品書き_comike_101.png', title: 'Comic Market 101' },
+          { url: 'image/お品書き_comike_100.png', title: 'Comic Market 100' },
+          { url: 'image/お品書き_comic1_19.jpg', title: 'Comic☆1 19' }
+        ]; // 画像のURLとタイトルを配列で指定
+        let currentIndex = 0;
+
+        const currentImage = document.getElementById('current-image');
+        const nextImage = document.getElementById('next-image');
+        const prevButton = document.getElementById('prev-button');
+        const nextButton = document.getElementById('next-button');
+        const imageTitle = document.getElementById('image-title');
+
+        function showImage(index) {
+          nextImage.src = images[index].url;
+          currentImage.classList.remove('active');
+          nextImage.classList.add('active');
+          setTimeout(() => {
+            currentImage.src = images[index].url;
+            currentImage.classList.add('active');
+            nextImage.classList.remove('active');
+            imageTitle.textContent = images[index].title;
+          }, 500);
+        }
+        
+        prevButton.addEventListener('click', () => {
+          currentIndex = (currentIndex - 1 + images.length) % images.length;
+          showImage(currentIndex);
+        });
+        
+        nextButton.addEventListener('click', () => {
+          currentIndex = (currentIndex + 1) % images.length;
+          showImage(currentIndex);
+        });
+        // 初期画像のタイトルを表示
+        imageTitle.textContent = images[currentIndex].title;
+
+        function animateVisibleElements() {
+          $('.tracking-in-expand').each(function() {
+            var elemPos = $(this).offset().top;
+            var scroll = $(window).scrollTop();
+            var windowHeight = $(window).height();
+            if (scroll > elemPos - windowHeight + 100 || elemPos < windowHeight) {
+              $(this).addClass('animate');
+            }
+          });
+        }
+
+        window.addEventListener('scroll', function() {
+          scrollPosition = window.pageYOffset;
+          if (document.body.classList.contains('dark-mode')) {
+            $('.stars').css('opacity', 1 - 0.0002 * scrollPosition);
+          }
+        });
+        
+        window.addEventListener("DOMContentLoaded", () => {
+          // 星を表示するための親要素を取得
+          const stars = document.querySelector(".stars");
+          // 星を生成する関数
+          const createStar = () => {
+            const starEl = document.createElement("span");
+            starEl.className = "star";
+            const minSize = 1; // 星の最小サイズを指定
+            const maxSize = 2; // 星の最大サイズを指定
+            const size = Math.random() * (maxSize - minSize) + minSize;
+            starEl.style.width = `${size}px`;
+            starEl.style.height = `${size}px`;
+            starEl.style.left = `${Math.random() * 100}%`;
+            starEl.style.top = `${Math.random() * 100}%`;
+            starEl.style.animationDelay = `${Math.random() * 10}s`;
+            stars.appendChild(starEl);
+          };
+          // for文で星を生成する関数を指定した回数呼び出す
+          for (let i = 0; i <= 500; i++) {
+            createStar();
+          }
+        });
+
+        $(window).on('scroll', animateVisibleElements);
+        animateVisibleElements(); // ページ読み込み時にも実行する
+
+        function animateProfile() {
+          var profileImage = $('.profile-image-wrapper');
+          var profileText = $('.profile-text');
+          var elemPos = profileImage.offset().top;
+          var scroll = $(window).scrollTop();
+          var windowHeight = $(window).height();
+          if (scroll > elemPos - windowHeight + 100) {
+            profileImage.addClass('animate');
+            setTimeout(function() {
+              profileText.addClass('animate');
+            }, 500);
+          }
+        }
+        
+        $(window).on('scroll', animateProfile);
+        animateProfile();
+
+        function animateGallery() {
+          var galleryImages = $('.gallery-image');
+          galleryImages.each(function() {
+            var elemPos = $(this).offset().top;
+            var scroll = $(window).scrollTop();
+            var windowHeight = $(window).height();
+            if (scroll > elemPos - windowHeight + 100) {
+              $(this).addClass('animate');
+            }
+          });
+        }
+        
+        $(window).on('scroll', animateGallery);
+        animateGallery();
+
+        $('.gallery-item').on('click', function() {
+          var imageUrl = $(this).find('img').attr('src');
+          var imageTitle = $(this).find('img').attr('alt');
+          var imageDescription = $(this).find('img').data('description');
+          
+          var image = new Image();
+          image.onload = function() {
+            var maxWidth = window.innerWidth * 0.7;
+            var maxHeight = window.innerHeight * 0.7;
+            var width = image.width;
+            var height = image.height;
+            
+            if (width > maxWidth) {
+              height *= maxWidth / width;
+              width = maxWidth;
+            }
+            
+            if (height > maxHeight) {
+              width *= maxHeight / height;
+              height = maxHeight;
+            }
+            
+            $('.gallery-modal-image').attr('src', imageUrl).css({
+              'width': width + 'px',
+              'height': height + 'px'
+            });
+            
+            $('.gallery-modal-title').text(imageTitle);
+            $('.gallery-modal-description').text(imageDescription);
+
+            $('#galleryModal').modal('show');
+          };
+          
+          image.src = imageUrl;
+        });
+
+        $('#galleryModal').on('shown.bs.modal', function() {
+          var modalImage = $('.gallery-modal-image');
+          var modalImageOffset = modalImage.offset();
+          var closeButton = $('#galleryModal .close');
+          var closeButtonWidth = closeButton.outerWidth();
+          var closeButtonPosition = modalImageOffset.left + modalImage.outerWidth() + 60;
+          
+          closeButton.css('right', $(window).width() - closeButtonPosition - closeButtonWidth);
+          $('.gallery-modal-image-wrapper').addClass('animate');
+        });
+
+        $('#galleryModal').on('hide.bs.modal', function() {
+          $('.modal-dialog').addClass('fade-out');
+        });
+        
+        $('#galleryModal').on('hidden.bs.modal', function() {
+          $('.gallery-modal-image-wrapper').removeClass('flipped back');
+          $('.modal-dialog').removeClass('fade-out');
+        });
+        
+        $('.gallery-modal-image-wrapper').on('click', function() {
+          $(this).toggleClass('flipped');
+
+          if ($(this).hasClass('flipped')) {
+            $(this).find('.gallery-modal-image').css('animation', 'none');
+            setTimeout(function() {
+              $('.gallery-modal-image-wrapper.flipped .gallery-modal-image').css('animation', '');
+            }, 50);
+          }
+        });
+
+      </script> 
+    </body> 
+    </html>

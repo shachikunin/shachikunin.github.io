@@ -1,0 +1,68 @@
+<!DOCTYPE html><html lang="ja"> <head> <meta charset="UTF-8"> <title>カラフルなパーティクルアニメーション</title> <style> body, html { height: 100%; margin: 0; overflow: hidden; background: black; } .particle { position: absolute; border-radius: 50%; } </style> </head> <body> <script> // パーティクルを生成する関数 
+    function createParticle() { 
+        const particle = document.createElement('div'); 
+        particle.classList.add('particle'); 
+        document.body.appendChild(particle);
+    // パーティクルのサイズと色をランダムに設定
+const size = Math.floor(Math.random() * 50 + 5);
+particle.style.width = `${size}px`;
+particle.style.height = `${size}px`;
+particle.style.background = `hsl(${Math.random() * 360}, 100%, 50%)`;
+
+// パーティクルの開始位置（画面の中心を固定）
+const startX = window.innerWidth / 2 - size / 2;
+const startY = window.innerHeight / 2 - size / 2;
+particle.style.left = `${startX}px`;
+particle.style.top = `${startY}px`;
+
+// パーティクルの終了位置（ランダム）
+const endX = (Math.random() - 0.5) * window.innerWidth * 2;
+const endY = (Math.random() - 0.5) * window.innerHeight * 2;
+
+// アニメーションの速度をランダムに設定
+const duration = Math.random() * 5500 + 1500; // 1.5秒から7秒の間でランダム
+
+// アニメーションの拡大率を速度に応じて設定
+let scale = duration / 750; // 速度が遅いほど拡大率が大きくなる
+
+// 終了位置とパーティクルの半径を考慮して画面外かどうかを判定
+//const isOffscreen = 
+  //endX + size * scale / 2 < 0 ||
+  //endX - size * scale / 2 > window.innerWidth ||
+  //endY + size * scale / 2 < 0 ||
+  //endY - size * scale / 2 > window.innerHeight;
+const isOffscreen = 
+  endX + size * scale / 2 <  - window.innerWidth / 2 ||
+  endX - size * scale / 2 > window.innerWidth / 2||
+  endY + size * scale / 2 < - window.innerHeight / 2 ||
+  endY - size * scale / 2 > window.innerHeight / 2;
+
+// 画面外の場合はそのまま、画面内の場合は縮小して削除
+if (!isOffscreen) {
+  scale = 0;
+}
+
+// アニメーションの設定
+const animation = particle.animate([
+  {
+    transform: `translate(0, 0) scale(1)`
+  },
+  {
+    transform: `translate(${endX}px, ${endY}px) scale(${scale})`
+  }
+], {
+  duration: duration,
+  easing: 'ease-out',
+  fill: 'forwards'
+});
+
+// アニメーションが終了したらパーティクルを削除
+animation.onfinish = () => {
+  particle.remove();
+};
+
+}
+// パーティクルを定期的に生成
+setInterval(createParticle, 50);
+</script>
+</body> </html>

@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        background-color: #f0f0f0;
+        }
+
+        .gachapon {
+        position: relative;
+        width: 200px;
+        height: 400px;
+        background-color: #ddd;
+        border-radius: 10px;
+        overflow: hidden;
+        }
+
+        .lever {
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 20px;
+        height: 80px;
+        background-color: #777;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: transform 0.5s ease, box-shadow 0.3s ease; /* アニメーションを追加 */
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.7); /* 初期は光らせる */
+        }
+
+        .lever:hover {
+        background-color: #555;
+        }
+
+        .lever::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 10px;
+        height: 50%;
+        background-color: #333;
+        border-radius: 5px;
+        }
+
+        .lever::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 5px;
+        height: 20%;
+        background-color: #333;
+        border-radius: 2px;
+        }
+
+        .coin-slot {
+        position: absolute;
+        top: 60%;
+        left: 80%;
+        transform: translateX(-50%);
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        background-color: #888888;
+        cursor: pointer;
+        }
+        
+        .coin-slot:hover {
+        background-color: #666666;
+        }
+        
+        .coin-slot-insert {
+        position: absolute;
+        top: 20%;
+        left: 50%;
+        transform: translateX(-50%);
+        border-radius: 20%;
+        width: 5px;
+        height: 30px;
+        background-color: #222222;
+        cursor: pointer;
+        }
+        .circle-behind-lever {
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80px;
+        height: 80px;
+        background-color: #aaaaaa;
+        border-radius: 50%;
+        }
+        .capsule-window {
+        position: absolute;
+        top: 10%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 95%;
+        height: 35%;
+        background-color: #aaaaaa;
+        border-radius: 10px;
+        overflow: hidden;
+        transition: box-shadow 0.3s ease; /* アニメーションを追加 */
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.7); /* 初期は光らせる */
+        }
+
+        .capsule-inside {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 80px;
+        height: 80px;
+        background-color: #fff;
+        border-radius: 50%;
+        }
+        .exit {
+        position: absolute;
+        bottom: 5px;
+        left: 5%;
+        width: 30px;
+        height: 30px;
+        background-color: #aaaaaa;
+        border-radius: 10%;
+        }
+        
+        .gacha-ball {
+        position: absolute;
+        bottom: 70%;
+        left: -10%;
+        transform: translateX(-50%);
+        width: 20px;
+        height: 20px;
+        background-color: #e74c3c;
+        border-radius: 50%;
+        animation: gachaBallAnimation 1s ease-in-out forwards;
+        display: none;
+        }
+
+        @keyframes gachaBallAnimation {
+        0% {
+            transform: translate(50%, 0%) translateY(0);
+            opacity: 0;
+        }
+        30% {
+            transform: translate(50%, 95%) translateY(0);
+            opacity: 1;
+            display: block;
+        }
+        50% {
+            transform: translate(50%, 60%) translateY(0);
+            opacity: 1;
+            display: block;
+        }
+        100% {
+            transform: translate(50%, 95%) translateY(0);
+            opacity: 1;
+            display: block;
+        }
+        }
+    </style>
+    </head>
+    <body>
+
+    <div class="gachapon">
+    <div class="circle-behind-lever"></div>
+    <div class="coin-slot" onclick="insertCoin()" onmouseover="highlight(this)" onmouseout="removeHighlight(this)">
+        <div class="coin-slot-insert"></div></div>
+    <div class="lever" onclick="pullLever()" onmouseover="highlight(this)" onmouseout="removeHighlight(this)" style="pointer-events: none;"></div>
+    
+    <div class="capsule-window" onmouseover="highlight(this)" onmouseout="removeHighlight(this)">
+        <div class="capsule-inside" style="left: 30%; top: 35%; border: 1px solid #000000; background: linear-gradient(300deg, #ffffff 0%, #ffffff 50%, #f2614e 50%, #f2614e 100%); opacity: 0.7"></div>
+        <div class="capsule-inside" style="left:65%; top: 45%; border: 1px solid #000000; background: linear-gradient(160deg, #ffffff 0%, #ffffff 50%, #90f096 50%, #90f096 100%); opacity: 0.7"></div>
+        <div class="capsule-inside" style="left:40%; top: 60%; border: 1px solid #000000; background: linear-gradient(45deg, #ffffff 0%, #ffffff 50%, #90f096 50%, #90f096 100%); opacity: 0.7"></div>
+        <div class="capsule-inside" style="left: 25%; top: 70%; border: 1px solid #000000; background: linear-gradient(to bottom, #ffffff 0%, #ffffff 50%, #52e9fa 50%, #52e9fa 100%); opacity: 0.7"></div>
+        <div class="capsule-inside" style="left: 75%; top: 70%; border: 1px solid #000000; background: linear-gradient(300deg, #ffffff 0%, #ffffff 50%, #f2614e 50%, #f2614e 100%); opacity: 0.7"></div>
+    </div>
+    <div class="exit" onclick="toggleAnimation()">
+        <div class="gacha-ball"></div>
+    </div>
+    
+    </div>
+
+    <script>
+    let rotationAngle = 0; // 初期角度
+
+    function insertCoin() {
+        const lever = document.querySelector('.lever');
+        const CoinContainer = document.querySelector('.coin-slot');
+        lever.style.transition = 'transform 0.5s ease';
+        lever.style.transform = `translateX(-50%) rotate(${rotationAngle}deg)`;
+        lever.style.pointerEvents = 'auto'; // レバーのクリックを有効にする
+        
+        CoinContainer.style.pointerEvents = 'none'; // コインの入口のクリックを無効にする
+        resetAnimation()
+    }
+
+    function pullLever() {
+        const lever = document.querySelector('.lever');
+        const CoinContainer = document.querySelector('.coin-slot');
+        rotationAngle += 360; // 360度ずつ増やす
+        lever.style.transition = 'transform 0.8s ease';
+        lever.style.transform = `translateX(-50%) rotate(${rotationAngle}deg)`;
+        lever.style.pointerEvents = 'none'; // コインの入口のクリックを無効にする
+        
+        CoinContainer.style.pointerEvents = 'auto'; // コインの入口のクリックを有効にする
+        
+        startAnimation()
+
+        // 一回転後にアニメーションとレバーのクリックを有効に戻す
+        setTimeout(() => {
+        lever.style.transition = '';
+        }, 300);
+    }
+    
+    function startAnimation() {
+        const circle = document.querySelector('.gacha-ball');
+        const randomAngle = Math.floor(Math.random() * 360);
+        const randomColor = getRandomColor();
+        const gradient = `linear-gradient(${randomAngle}deg, #ffffff 0%, #ffffff 50%, ${randomColor} 50%, ${randomColor} 100%)`;
+        
+        circle.style.background = gradient;
+        circle.style.display = 'block';
+        circle.style.animation = 'gachaBallAnimation 1s ease-in-out forwards';
+    }
+
+    function resetAnimation() {
+        const circle = document.querySelector('.gacha-ball');
+        circle.style.setProperty("display", "none", "important");
+    }
+
+    function getRandomColor() {
+        const letters = '0123456789ABCDEF';
+        let color = '#';
+        for (let i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+    }
+
+    function highlight(element) {
+        element.style.boxShadow = '0 0 20px rgba(255, 255, 255, 0.9)';
+    }
+
+    function removeHighlight(element) {
+        element.style.boxShadow = '0 0 10px rgba(255, 255, 255, 0.7)';
+    }
+
+    function toggleAnimation() {
+        const circle = document.querySelector('.gacha-ball');
+        const isAnimating = getComputedStyle(circle).getPropertyValue('animation-play-state') === 'running';
+
+        if (isAnimating) {
+        resetAnimation();
+        }
+    }
+</script>
+
+</body>
+</html>
