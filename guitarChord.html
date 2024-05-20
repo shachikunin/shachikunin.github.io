@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ギターコードからMIDIに変えるよ</title>
+  <style>
+    table {
+      border-collapse: collapse;
+    }
+    td {
+      width: 30px;
+      height: 30px;
+      border: 1px solid black;
+      text-align: center;
+      cursor: pointer;
+    }
+    .selected {
+      background-color: lightblue;
+    }
+    .muted {
+      background-color: gray;
+    }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+</head>
+<body>
+  <h1>ギターコードからMIDIに変えるよ</h1>
+  <select id="rootNoteSelect">
+    <option value="C">C</option>
+    <option value="C#">C#</option>
+    <option value="D">D</option>
+    <option value="D#">D#</option>
+    <option value="E">E</option>
+    <option value="F">F</option>
+    <option value="F#">F#</option>
+    <option value="G">G</option>
+    <option value="G#">G#</option>
+    <option value="A">A</option>
+    <option value="A#">A#</option>
+    <option value="B">B</option>
+  </select>
+
+  <select id="chordTypeSelect">
+    <option value="">Major</option>
+    <option value="m">Minor</option>
+    <option value="maj7">Major 7th</option>
+    <option value="7">7th</option>
+    <option value="m7">Minor 7th</option>
+    <option value="dim">Diminished</option>
+    <option value="add9">Add 9th</option>
+    <option value="sus4">Suspended 4th</option>
+    <option value="aug">Augmented</option>
+    <option value="m7b5">Minor 7th Flat 5th</option>
+  </select>
+
+  <button id="applyChordButton">適用</button>
+  <table>
+    <thead>
+      <tr>
+        <th>弦</th>
+        <th>ミュート</th>
+        <th>開放</th>
+        <th>1</th>
+        <th>2</th>
+        <th>3</th>
+        <th>4</th>
+        <th>5</th>
+        <th>6</th>
+        <th>7</th>
+        <th>8</th>
+        <th>9</th>
+        <th>10</th>
+        <th>11</th>
+        <th>12</th>
+        <th>13</th>
+        <th>14</th>
+        <th>15</th>
+        <th>16</th>
+        <th>17</th>
+        <th>18</th>
+        <th>19</th>
+        <th>20</th>
+        <th>21</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1弦</td>
+        <td><input type="checkbox" id="mute6"></td>
+        <td id="string6-0" data-string="6" data-fret="0"></td>
+        <td id="string6-1" data-string="6" data-fret="1"></td>
+        <td id="string6-2" data-string="6" data-fret="2"></td>
+        <td id="string6-3" data-string="6" data-fret="3"></td>
+        <td id="string6-4" data-string="6" data-fret="4"></td>
+        <td id="string6-5" data-string="6" data-fret="5"></td>
+        <td id="string6-6" data-string="6" data-fret="6"></td>
+        <td id="string6-7" data-string="6" data-fret="7"></td>
+        <td id="string6-8" data-string="6" data-fret="8"></td>
+        <td id="string6-9" data-string="6" data-fret="9"></td>
+        <td id="string6-10" data-string="6" data-fret="10"></td>
+        <td id="string6-11" data-string="6" data-fret="11"></td>
+        <td id="string6-12" data-string="6" data-fret="12"></td>
+        <td id="string6-13" data-string="6" data-fret="13"></td>
+        <td id="string6-14" data-string="6" data-fret="14"></td>
+        <td id="string6-15" data-string="6" data-fret="15"></td>
+        <td id="string6-16" data-string="6" data-fret="16"></td>
+        <td id="string6-17" data-string="6" data-fret="17"></td>
+        <td id="string6-18" data-string="6" data-fret="18"></td>
+        <td id="string6-19" data-string="6" data-fret="19"></td>
+        <td id="string6-20" data-string="6" data-fret="20"></td>
+        <td id="string6-21" data-string="6" data-fret="21"></td>
+      </tr>
+      <tr>
+        <td>2弦</td>
+        <td><input type="checkbox" id="mute5"></td>
+        <td id="string5-0" data-string="5" data-fret="0"></td>
+        <td id="string5-1" data-string="5" data-fret="1"></td>
+        <td id="string5-2" data-string="5" data-fret="2"></td>
+        <td id="string5-3" data-string="5" data-fret="3"></td>
+        <td id="string5-4" data-string="5" data-fret="4"></td>
+        <td id="string5-5" data-string="5" data-fret="5"></td>
+        <td id="string5-6" data-string="5" data-fret="6"></td>
+        <td id="string5-7" data-string="5" data-fret="7"></td>
+        <td id="string5-8" data-string="5" data-fret="8"></td>
+        <td id="string5-9" data-string="5" data-fret="9"></td>
+        <td id="string5-10" data-string="5" data-fret="10"></td>
+        <td id="string5-11" data-string="5" data-fret="11"></td>
+        <td id="string5-12" data-string="5" data-fret="12"></td>
+        <td id="string5-13" data-string="5" data-fret="13"></td>
+        <td id="string5-14" data-string="5" data-fret="14"></td>
+        <td id="string5-15" data-string="5" data-fret="15"></td>
+        <td id="string5-16" data-string="5" data-fret="16"></td>
+        <td id="string5-17" data-string="5" data-fret="17"></td>
+        <td id="string5-18" data-string="5" data-fret="18"></td>
+        <td id="string5-19" data-string="5" data-fret="19"></td>
+        <td id="string5-20" data-string="5" data-fret="20"></td>
+        <td id="string5-21" data-string="5" data-fret="21"></td>
+      </tr>
+      <tr>
+        <td>3弦</td>
+        <td><input type="checkbox" id="mute4"></td>
+        <td id="string4-0" data-string="4" data-fret="0"></td>
+        <td id="string4-1" data-string="4" data-fret="1"></td>
+        <td id="string4-2" data-string="4" data-fret="2"></td>
+        <td id="string4-3" data-string="4" data-fret="3"></td>
+        <td id="string4-4" data-string="4" data-fret="4"></td>
+        <td id="string4-5" data-string="4" data-fret="5"></td>
+        <td id="string4-6" data-string="4" data-fret="6"></td>
+        <td id="string4-7" data-string="4" data-fret="7"></td>
+        <td id="string4-8" data-string="4" data-fret="8"></td>
+        <td id="string4-9" data-string="4" data-fret="9"></td>
+        <td id="string4-10" data-string="4" data-fret="10"></td>
+        <td id="string4-11" data-string="4" data-fret="11"></td>
+        <td id="string4-12" data-string="4" data-fret="12"></td>
+        <td id="string4-13" data-string="4" data-fret="13"></td>
+        <td id="string4-14" data-string="4" data-fret="14"></td>
+        <td id="string4-15" data-string="4" data-fret="15"></td>
+        <td id="string4-16" data-string="4" data-fret="16"></td>
+        <td id="string4-17" data-string="4" data-fret="17"></td>
+        <td id="string4-18" data-string="4" data-fret="18"></td>
+        <td id="string4-19" data-string="4" data-fret="19"></td>
+        <td id="string4-20" data-string="4" data-fret="20"></td>
+        <td id="string4-21" data-string="4" data-fret="21"></td>
+      </tr>
+      <tr>
+        <td>4弦</td>
+        <td><input type="checkbox" id="mute3"></td>
+        <td id="string3-0" data-string="3" data-fret="0"></td>
+        <td id="string3-1" data-string="3" data-fret="1"></td>
+        <td id="string3-2" data-string="3" data-fret="2"></td>
+        <td id="string3-3" data-string="3" data-fret="3"></td>
+        <td id="string3-4" data-string="3" data-fret="4"></td>
+        <td id="string3-5" data-string="3" data-fret="5"></td>
+        <td id="string3-6" data-string="3" data-fret="6"></td>
+        <td id="string3-7" data-string="3" data-fret="7"></td>
+        <td id="string3-8" data-string="3" data-fret="8"></td>
+        <td id="string3-9" data-string="3" data-fret="9"></td>
+        <td id="string3-10" data-string="3" data-fret="10"></td>
+        <td id="string3-11" data-string="3" data-fret="11"></td>
+        <td id="string3-12" data-string="3" data-fret="12"></td>
+        <td id="string3-13" data-string="3" data-fret="13"></td>
+        <td id="string3-14" data-string="3" data-fret="14"></td>
+        <td id="string3-15" data-string="3" data-fret="15"></td>
+        <td id="string3-16" data-string="3" data-fret="16"></td>
+        <td id="string3-17" data-string="3" data-fret="17"></td>
+        <td id="string3-18" data-string="3" data-fret="18"></td>
+        <td id="string3-19" data-string="3" data-fret="19"></td>
+        <td id="string3-20" data-string="3" data-fret="20"></td>
+        <td id="string3-21" data-string="3" data-fret="21"></td>
+      </tr>
+      <tr>
+        <td>5弦</td>
+        <td><input type="checkbox" id="mute2"></td>
+        <td id="string2-0" data-string="2" data-fret="0"></td>
+        <td id="string2-1" data-string="2" data-fret="1"></td>
+        <td id="string2-2" data-string="2" data-fret="2"></td>
+        <td id="string2-3" data-string="2" data-fret="3"></td>
+        <td id="string2-4" data-string="2" data-fret="4"></td>
+        <td id="string2-5" data-string="2" data-fret="5"></td>
+        <td id="string2-6" data-string="2" data-fret="6"></td>
+        <td id="string2-7" data-string="2" data-fret="7"></td>
+        <td id="string2-8" data-string="2" data-fret="8"></td>
+        <td id="string2-9" data-string="2" data-fret="9"></td>
+        <td id="string2-10" data-string="2" data-fret="10"></td>
+        <td id="string2-11" data-string="2" data-fret="11"></td>
+        <td id="string2-12" data-string="2" data-fret="12"></td>
+        <td id="string2-13" data-string="2" data-fret="13"></td>
+        <td id="string2-14" data-string="2" data-fret="14"></td>
+        <td id="string2-15" data-string="2" data-fret="15"></td>
+        <td id="string2-16" data-string="2" data-fret="16"></td>
+        <td id="string2-17" data-string="2" data-fret="17"></td>
+        <td id="string2-18" data-string="2" data-fret="18"></td>
+        <td id="string2-19" data-string="2" data-fret="19"></td>
+        <td id="string2-20" data-string="2" data-fret="20"></td>
+        <td id="string2-21" data-string="2" data-fret="21"></td>
+      </tr>
+      <tr>
+        <td>6弦</td>
+        <td><input type="checkbox" id="mute1"></td>
+        <td id="string1-0" data-string="1" data-fret="0"></td>
+        <td id="string1-1" data-string="1" data-fret="1"></td>
+        <td id="string1-2" data-string="1" data-fret="2"></td>
+        <td id="string1-3" data-string="1" data-fret="3"></td>
+        <td id="string1-4" data-string="1" data-fret="4"></td>
+        <td id="string1-5" data-string="1" data-fret="5"></td>
+        <td id="string1-6" data-string="1" data-fret="6"></td>
+        <td id="string1-7" data-string="1" data-fret="7"></td>
+        <td id="string1-8" data-string="1" data-fret="8"></td>
+        <td id="string1-9" data-string="1" data-fret="9"></td>
+        <td id="string1-10" data-string="1" data-fret="10"></td>
+        <td id="string1-11" data-string="1" data-fret="11"></td>
+        <td id="string1-12" data-string="1" data-fret="12"></td>
+        <td id="string1-13" data-string="1" data-fret="13"></td>
+        <td id="string1-14" data-string="1" data-fret="14"></td>
+        <td id="string1-15" data-string="1" data-fret="15"></td>
+        <td id="string1-16" data-string="1" data-fret="16"></td>
+        <td id="string1-17" data-string="1" data-fret="17"></td>
+        <td id="string1-18" data-string="1" data-fret="18"></td>
+        <td id="string1-19" data-string="1" data-fret="19"></td>
+        <td id="string1-20" data-string="1" data-fret="20"></td>
+        <td id="string1-21" data-string="1" data-fret="21"></td>
+      </tr>
+    </tbody>
+  </table>
+  <div id="notes"></div>
+  <div id="fretPositions"></div>
+  <button id="downloadMIDI">MIDIダウンロード</button>
+  <button id="playMIDI">MIDI再生</button>
+
+  <script src="guitar-midi-download.js"></script>
+    
+</body>
+</html>

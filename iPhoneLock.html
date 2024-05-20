@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iPhone風ロック画面</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap'); /* Robotoフォントを使用 */
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #000;
+            font-family: 'Roboto', sans-serif;
+        }
+        .iphone-frame {
+            position: relative;
+            width: 375px; /* iPhone 8 width */
+            height: 667px; /* iPhone 8 height */
+            border: 3px solid #404045;
+            border-radius: 50px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            background-color: #000;
+        }
+        .screen {
+            position: absolute;
+            top: 16px;
+            bottom: 16px;
+            left: 16px;
+            right: 16px;
+            border-radius: 30px;
+            overflow: hidden;
+            background: #000;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        .background-image {
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            background: linear-gradient(20deg, #FA68AB, #3FD8D8);
+            background-size: 400% 400%;
+            animation: GradientBackground 4s ease infinite;
+            transition: filter 0.3s ease, opacity 0.5s ease;
+        }
+        
+        
+        .lock-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            color: rgba(255, 255, 255, 0.85); /* 文字を少し透かす */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .music-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+        }
+        .album-art {
+            width: 250px;
+            height: 250px;
+            background-color: #fff;
+            overflow: hidden;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .album-art-image {
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            background-color: #99ffdf;
+            background-image:
+                radial-gradient(at 33% 88%, hsla(106,75%,70%,1) 0px, transparent 50%),
+                radial-gradient(at 81% 28%, hsla(18,78%,75%,1) 0px, transparent 50%),
+                radial-gradient(at 3% 16%, hsla(337,71%,72%,1) 0px, transparent 50%),
+                radial-gradient(at 28% 38%, hsla(325,98%,70%,1) 0px, transparent 50%),
+                radial-gradient(at 65% 35%, hsla(218,91%,72%,1) 0px, transparent 50%),
+                radial-gradient(at 76% 6%, hsla(44,80%,77%,1) 0px, transparent 50%);
+            transition: opacity 0.5s ease;
+        }
+        
+        .music-player {
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        .top-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .time {
+            font-size: 60px;
+            font-weight: bold;
+        }
+        .date {
+            font-size: 20px;
+        }
+        .bottom-info {
+            text-align: center;
+            color: #fff;
+        }
+        .unlock-text {
+            font-size: 18px;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 5px;
+            background: rgba(102, 102, 102, 0.3);
+            border-radius: 2.5px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        .progress {
+            width: 40%;
+            height: 100%;
+            background: #000;
+        }
+        .music-player .song-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .music-player .song-artist {
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        .music-player .controls {
+            display: flex;
+            justify-content: space-around;
+        }
+        .music-player .controls button {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        .thumbnail-carousel {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            white-space: nowrap;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+        }
+        .thumbnail {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        .thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        @keyframes GradientBackground {
+          0% {
+            background-position: 0% 50%;
+          }
+
+          50% {
+            background-position: 100% 50%;
+          }
+
+          100% {
+            background-position: 0% 50%;
+          }
+        };
+    </style>
+</head>
+<body>
+    <div class="iphone-frame">
+        <div class="screen">
+            <div class="background-image"></div>
+            <div class="lock-screen">
+                <div class="top-info">
+                    <span class="time" id="current-time"></span>
+                    <span class="date" id="current-date"></span>
+                </div>
+                <div class="bottom-info">
+                    <span class="unlock-text">スワイプで音楽プレイヤー表示</span>
+                </div>
+            </div>
+            <div class="music-container">
+                <div class="album-art">
+                    <div class="album-art-image"></div>
+                </div>
+                <div class="music-player">
+                    <div class="song-title">曲名</div>
+                    <div class="song-artist">アーティスト名</div>
+                    <div class="progress-bar">
+                        <div class="progress"></div>
+                    </div>
+                    <div class="controls">
+                        <button>&#9664;</button>
+                        <button>&#9654;</button>
+                        <button>&#9654;&#9654;</button>
+                    </div>
+                </div>
+                <div class="bottom-info">
+                    <span class="unlock-text">スワイプで音楽プレイヤー非表示</span>
+                </div>
+            </div>
+        </div>
+    </div>
+     <div class="thumbnail-carousel">
+            <div class="thumbnail"><img src="https://dl.dropboxusercontent.com/scl/fi/fx37075ffttc3gapqunq5/illust_1.png?rlkey=459g5lh3xwv8nuau98axcmrd7" alt="サムネイル1"></div>
+            <div class="thumbnail"><img src="https://dl.dropboxusercontent.com/scl/fi/tt171nwwy6ajo5lqdvbgw/illust_2.png?rlkey=rnystkc99r4nbv3y5ujlypd4e" alt="サムネイル2"></div>
+            <div class="thumbnail"><img src="https://dl.dropboxusercontent.com/scl/fi/ob6zs14p7j7513razi80k/illust_3.png?rlkey=lewmpw6r275pd2aq8gxd7j68p" alt="サムネイル3"></div>
+            <div class="thumbnail"><img src="https://dl.dropboxusercontent.com/scl/fi/7md574q73a7nsvr0v69le/illust_6.png?rlkey=7j4con7o82jjn0sky6hxr5782" alt="サムネイル4"></div>
+            <div class="thumbnail"><img src="https://dl.dropboxusercontent.com/scl/fi/yid6kkx3rw2ehm648cnkd/illust_5.png?rlkey=uwollvz2l6fehcnd49rhr51mp" alt="サムネイル5"></div>
+        </div>
+    
+    <script>
+        const screenElement = document.querySelector('.screen');
+        const backgroundElement = document.querySelector('.background-image');
+        const lockScreenElement = document.querySelector('.lock-screen');
+        const musicPlayerElement = document.querySelector('.music-player');
+        const albumArtElement = document.querySelector('.album-art-image');
+        const musicContainerElement = document.querySelector('.music-container');
+        const thumbnails = document.querySelectorAll('.thumbnail img');
+        let startY = 0;
+        let isSwiping = false;
+        let timeoutId;
+
+        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('mouseout', handleMouseOut);
+
+        function handleMouseMove(event) {
+            if (event.target.closest('.screen')) {
+                clearTimeout(timeoutId);
+                screenElement.style.opacity = '1';
+                timeoutId = setTimeout(() => {
+                    screenElement.style.opacity = '0';
+                }, 10000);
+            }
+        }
+
+        function handleMouseOut(event) {
+            if (!event.target.closest('.screen')) {
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(() => {
+                    screenElement.style.opacity = '0';
+                }, 10000);
+            }
+        }
+
+        screenElement.addEventListener('mousedown', startSwipe);
+        screenElement.addEventListener('touchstart', startSwipe);
+        screenElement.addEventListener('mousemove', moveSwipe);
+        screenElement.addEventListener('touchmove', moveSwipe);
+        screenElement.addEventListener('mouseup', endSwipe);
+        screenElement.addEventListener('touchend', endSwipe);
+
+        function startSwipe(event) {
+            isSwiping = true;
+            startY = event.touches ? event.touches[0].clientY : event.clientY;
+        }
+
+        function moveSwipe(event) {
+            if (!isSwiping) return;
+            const currentY = event.touches ? event.touches[0].clientY : event.clientY;
+            const deltaY = currentY - startY;
+
+            if (deltaY < -50) {
+                showMusicPlayer();
+                isSwiping = false;
+            } else if (deltaY > 50) {
+                hideMusicPlayer();
+                isSwiping = false;
+            }
+        }
+
+        function endSwipe() {
+            isSwiping = false;
+        }
+
+        function showMusicPlayer() {
+            backgroundElement.style.filter = 'blur(20px)';
+            lockScreenElement.style.display = 'none';
+            musicContainerElement.style.display = 'flex';
+        }
+
+        function hideMusicPlayer() {
+            backgroundElement.style.filter = 'none';
+            lockScreenElement.style.display = 'flex';
+            musicContainerElement.style.display = 'none';
+        }
+
+        thumbnails.forEach(thumbnail => {
+            thumbnail.addEventListener('click', () => {
+                const newSrc = thumbnail.src;
+                backgroundElement.style.opacity = 0;
+                albumArtElement.style.opacity = 0;
+                setTimeout(() => {
+                    backgroundElement.style.backgroundImage = `url(${newSrc})`;
+                    albumArtElement.style.backgroundImage = `url(${newSrc})`;
+                    backgroundElement.style.backgroundSize = 'cover';
+                    backgroundElement.style.backgroundPosition = 'center';
+                    albumArtElement.style.backgroundSize = 'cover';
+                    albumArtElement.style.backgroundPosition = 'center';
+                    backgroundElement.style.opacity = 1;
+                    albumArtElement.style.opacity = 1;
+                    backgroundElement.style.animation = 'none';
+                }, 500);
+            });
+        });
+        
+        function updateDateTime() {
+            const now = new Date();
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const month = (now.getMonth() + 1).toString();
+            const day = now.getDate().toString();
+            const weekday = ['日', '月', '火', '水', '木', '金', '土'][now.getDay()];
+
+            document.getElementById('current-time').textContent = `${hours}:${minutes}`;
+            document.getElementById('current-date').textContent = `${month}月${day}日 ${weekday}曜日`;
+        }
+
+        // 初期表示
+        updateDateTime();
+
+        // 1秒ごとに更新
+        setInterval(updateDateTime, 1000);
+    </script>
+</body>
+</html>
