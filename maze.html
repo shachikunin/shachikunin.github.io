@@ -135,8 +135,8 @@
         function loadTextures() {
 		    const textureLoader = new THREE.TextureLoader();
 		    
-		    wallTexture = textureLoader.load('./image/brick-3671612_1920.jpg');
-		    floorTexture = textureLoader.load('./image/wood-789139_1920.jpg');
+		    wallTexture = textureLoader.load('./image/brick-3671612_1920.jpg');//ローカルでは読み込めないので注意
+		    floorTexture = textureLoader.load('./image/wood-789139_1920.jpg');//ローカルでは読み込めないので注意
 		    
 		    // テクスチャの繰り返しを設定
 		    wallTexture.wrapS = wallTexture.wrapT = THREE.RepeatWrapping;

@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>スイカゲーム - 絵文字版</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.18.0/matter.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+        #game-container {
+            display: flex;
+            width: 100%;
+            max-width: 800px;
+            height: 100vh;
+            max-height: 600px;
+            background-color: white;
+            border: 2px solid #333;
+        }
+        #game-area {
+            width: 50%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+        #info-area {
+            width: 50%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+            background-color: #f8f8f8;
+            overflow-y: auto;
+        }
+        #next-fruit {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        #score {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        #ghost-fruit {
+            position: absolute;
+            top: 0;
+            left: 0;
+            font-size: 40px;
+            pointer-events: none;
+            opacity: 0.5;
+        }
+        #fruit-chart {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .fruit-evolution {
+            display: flex;
+            align-items: center;
+            font-size: 24px;
+        }
+        .fruit-evolution::after {
+            content: "→";
+            margin: 0 5px;
+        }
+        .fruit-evolution:last-child::after {
+            content: "";
+        }
+        #game-instruction {
+            font-size: 16px;
+            text-align: center;
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #e6f3ff;
+            border-radius: 5px;
+            border: 1px solid #b3d9ff;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <div id="game-area">
+            <div id="ghost-fruit"></div>
+        </div>
+        <div id="info-area">
+            <div id="next-fruit"></div>
+            <div id="score">スコア: 0</div>
+            <div id="game-instruction">
+                同じ果物同士がぶつかると果物が進化して大きくなるぞ！
+            </div>
+            <div id="fruit-chart"></div>
+        </div>
+    </div>
+
+    <script>
+        const Engine = Matter.Engine,
+              Render = Matter.Render,
+              Runner = Matter.Runner,
+              World = Matter.World,
+              Bodies = Matter.Bodies,
+              Events = Matter.Events;
+
+        const engine = Engine.create();
+        const gameArea = document.getElementById('game-area');
+        const render = Render.create({
+            element: gameArea,
+            engine: engine,
+            options: {
+                wireframes: false,
+                background: 'white'
+            }
+        });
+
+        const fruits = [
+            { name: 'さくらんぼ', radius: 15, emoji: '🍒', score: 1 },
+            { name: 'いちご', radius: 20, emoji: '🍓', score: 3 },
+            { name: 'ぶどう', radius: 25, emoji: '🍇', score: 6 },
+            { name: 'みかん', radius: 30, emoji: '🍊', score: 10 },
+            { name: 'カキ', radius: 35, emoji: '🍂', score: 15 },
+            { name: 'りんご', radius: 40, emoji: '🍎', score: 21 },
+            { name: 'なし', radius: 45, emoji: '🍐', score: 28 },
+            { name: 'もも', radius: 50, emoji: '🍑', score: 36 },
+            { name: 'パイナップル', radius: 55, emoji: '🍍', score: 45 },
+            { name: 'メロン', radius: 60, emoji: '🍈', score: 55 },
+            { name: 'スイカ', radius: 65, emoji: '🍉', score: 66 }
+        ];
+
+        let walls = [];
+        let nextFruit = getRandomFruit();
+        let currentFruit = null;
+        let score = 0;
+        let canDrop = true;
+
+        function getRandomFruit() {
+            return fruits[Math.floor(Math.random() * 5)];
+        }
+
+        function updateNextFruit() {
+            document.getElementById('next-fruit').textContent = `次の果物:\n${nextFruit.emoji}`;
+            updateGhostFruit();
+        }
+
+        function updateScore() {
+            document.getElementById('score').textContent = `スコア: ${score}`;
+        }
+
+        function createFruitBody(x, y, fruit) {
+            const body = Bodies.circle(x, y, fruit.radius, {
+                restitution: 0.3,
+                friction: 0.1,
+                render: {
+                    sprite: {
+                        texture: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="${fruit.radius * 2}" height="${fruit.radius * 2}" viewBox="0 0 100 100"><text x="50" y="50" font-size="80" text-anchor="middle" dominant-baseline="central">${fruit.emoji}</text></svg>`,
+                        xScale: 1,
+                        yScale: 1
+                    }
+                }
+            });
+            body.fruitType = fruit;
+            return body;
+        }
+
+        function dropFruit(x) {
+            if (!canDrop) return;
+            canDrop = false;
+
+            currentFruit = createFruitBody(x, 50, nextFruit);
+            World.add(engine.world, currentFruit);
+
+            nextFruit = getRandomFruit();
+            updateNextFruit();
+
+            setTimeout(() => {
+                canDrop = true;
+                currentFruit = null;
+            }, 500);
+        }
+
+        function updateGhostFruit() {
+            const ghostFruit = document.getElementById('ghost-fruit');
+            ghostFruit.textContent = nextFruit.emoji;
+        }
+
+        function createFruitChart() {
+            const fruitChart = document.getElementById('fruit-chart');
+            fruitChart.innerHTML = '';
+            fruits.forEach((fruit, index) => {
+                const fruitElement = document.createElement('div');
+                fruitElement.className = 'fruit-evolution';
+                fruitElement.textContent = fruit.emoji;
+                fruitChart.appendChild(fruitElement);
+            });
+        }
+
+        function resizeGame() {
+            const gameContainer = document.getElementById('game-container');
+            const gameArea = document.getElementById('game-area');
+            const width = gameArea.clientWidth;
+            const height = gameArea.clientHeight;
+
+            render.canvas.width = width;
+            render.canvas.height = height;
+            render.options.width = width;
+            render.options.height = height;
+
+            // 壁の再作成
+            walls.forEach(wall => World.remove(engine.world, wall));
+            walls = [
+                Bodies.rectangle(width / 2, height + 30, width, 60, { isStatic: true }),
+                Bodies.rectangle(-30, height / 2, 60, height, { isStatic: true }),
+                Bodies.rectangle(width + 30, height / 2, 60, height, { isStatic: true })
+            ];
+            World.add(engine.world, walls);
+
+            // ゲーム内のオブジェクトのスケール調整
+            const scale = Math.min(width / 200, height / 600);
+            fruits.forEach(fruit => {
+                fruit.radius = fruit.radius * scale;
+            });
+        }
+
+        const ghostFruit = document.getElementById('ghost-fruit');
+
+        gameArea.addEventListener('mousemove', (event) => {
+            const rect = gameArea.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            ghostFruit.style.left = `${x - 20}px`;
+        });
+
+        gameArea.addEventListener('click', (event) => {
+            const rect = gameArea.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            if (canDrop && currentFruit === null) {
+                dropFruit(x);
+            }
+        });
+
+        gameArea.addEventListener('touchmove', (event) => {
+            event.preventDefault();
+            const rect = gameArea.getBoundingClientRect();
+            const x = event.touches[0].clientX - rect.left;
+            ghostFruit.style.left = `${x - 20}px`;
+        });
+
+        gameArea.addEventListener('touchend', (event) => {
+            event.preventDefault();
+            const rect = gameArea.getBoundingClientRect();
+            const x = event.changedTouches[0].clientX - rect.left;
+            if (canDrop && currentFruit === null) {
+                dropFruit(x);
+            }
+        });
+
+        Events.on(engine, 'collisionStart', (event) => {
+            const pairs = event.pairs;
+
+            for (let i = 0; i < pairs.length; i++) {
+                const bodyA = pairs[i].bodyA;
+                const bodyB = pairs[i].bodyB;
+
+                if (bodyA.fruitType && bodyB.fruitType && bodyA.fruitType === bodyB.fruitType) {
+                    const fruitIndex = fruits.indexOf(bodyA.fruitType);
+                    if (fruitIndex < fruits.length - 1) {
+                        const newFruit = fruits[fruitIndex + 1];
+                        const newBody = createFruitBody(
+                            (bodyA.position.x + bodyB.position.x) / 2,
+                            (bodyA.position.y + bodyB.position.y) / 2,
+                            newFruit
+                        );
+
+                        World.remove(engine.world, [bodyA, bodyB]);
+                        World.add(engine.world, newBody);
+
+                        score += newFruit.score;
+                        updateScore();
+                    }
+                }
+            }
+        });
+
+        window.addEventListener('resize', resizeGame);
+        resizeGame();
+        createFruitChart();
+
+        const runner = Runner.create();
+        Runner.run(runner, engine);
+        Render.run(render);
+
+        updateNextFruit();
+        updateScore();
+    </script>
+</body>
+</html>

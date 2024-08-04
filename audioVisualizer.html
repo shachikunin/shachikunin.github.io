@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Audio Visualizer</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        body { margin: 0; overflow: hidden; }
+        #controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            background: rgba(0,0,0,0.5);
+            padding: 10px;
+            border-radius: 5px;
+        }
+        button, input, select { padding: 5px 10px; }
+    </style>
+</head>
+<body>
+    <div id="controls">
+        <button id="playPause">再生/一時停止</button>
+        <input type="range" id="volume" min="0" max="1" step="0.1" value="1">
+        <input type="file" id="audioFile" accept="audio/*">
+        <select id="colorMode">
+            <option value="random">ランダム</option>
+            <option value="red">赤</option>
+            <option value="green">緑</option>
+            <option value="blue">青</option>
+            <option value="white">白</option>
+            <option value="changing">常に変化</option>
+        </select>
+    </div>
+
+    <script>
+        let scene, camera, renderer, particles, analyser, audioElement, audioContext, source, gainNode;
+        const particleCount = 5000;
+        const radius = 200;
+        let originalPositions, colors;
+        let colorMode = 'random';
+        let time = 0;
+        let material;
+
+        function init() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
+            camera.position.z = 400;
+
+            renderer = new THREE.WebGLRenderer();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+
+            createParticles();
+
+            audioElement = new Audio();
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            analyser = audioContext.createAnalyser();
+            source = audioContext.createMediaElementSource(audioElement);
+            gainNode = audioContext.createGain();
+            source.connect(gainNode);
+            gainNode.connect(analyser);
+            analyser.connect(audioContext.destination);
+
+            setupEventListeners();
+            animate();
+        }
+
+        function createParticles() {
+            const geometry = new THREE.BufferGeometry();
+            const positions = new Float32Array(particleCount * 3);
+            colors = new Float32Array(particleCount * 3);
+            originalPositions = new Float32Array(particleCount * 3);
+
+            for (let i = 0; i < particleCount; i++) {
+                const theta = Math.random() * Math.PI * 2;
+                const phi = Math.acos(Math.random() * 2 - 1);
+
+                const x = radius * Math.sin(phi) * Math.cos(theta);
+                const y = radius * Math.sin(phi) * Math.sin(theta);
+                const z = radius * Math.cos(phi);
+
+                positions[i * 3] = x;
+                positions[i * 3 + 1] = y;
+                positions[i * 3 + 2] = z;
+
+                originalPositions[i * 3] = x;
+                originalPositions[i * 3 + 1] = y;
+                originalPositions[i * 3 + 2] = z;
+
+                colors[i * 3] = Math.random();
+                colors[i * 3 + 1] = Math.random();
+                colors[i * 3 + 2] = Math.random();
+            }
+
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+            material = new THREE.PointsMaterial({
+                size: 3,
+                vertexColors: true,
+                blending: THREE.AdditiveBlending,
+                transparent: true
+            });
+
+            particles = new THREE.Points(geometry, material);
+            scene.add(particles);
+        }
+
+        function setupEventListeners() {
+            const playPauseButton = document.getElementById('playPause');
+            const volumeControl = document.getElementById('volume');
+            const fileInput = document.getElementById('audioFile');
+            const colorModeSelect = document.getElementById('colorMode');
+
+            playPauseButton.addEventListener('click', togglePlayPause);
+            volumeControl.addEventListener('input', (e) => {
+                gainNode.gain.setValueAtTime(e.target.value, audioContext.currentTime);
+            });
+            fileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const fileURL = URL.createObjectURL(file);
+                    audioElement.src = fileURL;
+                    audioElement.load();
+                }
+            });
+            colorModeSelect.addEventListener('change', (e) => {
+                colorMode = e.target.value;
+                updateParticleColors();
+            });
+        }
+
+        function togglePlayPause() {
+            if (audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+            
+            if (audioElement.paused) {
+                audioElement.play();
+            } else {
+                audioElement.pause();
+            }
+        }
+
+        function updateParticleColors() {
+            const colorAttribute = particles.geometry.attributes.color;
+
+            if (colorMode === 'random') {
+                for (let i = 0; i < particleCount; i++) {
+                    colorAttribute.setXYZ(i, Math.random(), Math.random(), Math.random());
+                }
+            } else if (colorMode !== 'changing') {
+                const color = new THREE.Color(colorMode);
+                for (let i = 0; i < particleCount; i++) {
+                    colorAttribute.setXYZ(i, color.r, color.g, color.b);
+                }
+            }
+
+            colorAttribute.needsUpdate = true;
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            time += 0.01;
+            particles.rotation.x = time * 0.1;
+            particles.rotation.y = time * 0.2;
+
+            if (colorMode === 'changing') {
+                const colorAttribute = particles.geometry.attributes.color;
+                const r = Math.sin(time * 0.5) * 0.5 + 0.5;
+                const g = Math.sin(time * 0.5 + 2) * 0.5 + 0.5;
+                const b = Math.sin(time * 0.5 + 4) * 0.5 + 0.5;
+                for (let i = 0; i < particleCount; i++) {
+                    colorAttribute.setXYZ(i, r, g, b);
+                }
+                colorAttribute.needsUpdate = true;
+            }
+
+            if (analyser) {
+                const frequencyData = new Uint8Array(analyser.frequencyBinCount);
+                analyser.getByteFrequencyData(frequencyData);
+
+                const positions = particles.geometry.attributes.position.array;
+
+                for (let i = 0; i < particleCount; i++) {
+                    const index = Math.floor(i / particleCount * frequencyData.length);
+                    const frequency = frequencyData[index];
+                    const amplitude = frequency / 256;
+
+                    const springFactor = 0.2;
+                    const dampingFactor = 1;
+                    const maxDisplacement = 1.2;
+
+                    const displacement = amplitude * maxDisplacement * radius;
+                    const targetX = originalPositions[i * 3] * (1 + displacement / radius);
+                    const targetY = originalPositions[i * 3 + 1] * (1 + displacement / radius);
+                    const targetZ = originalPositions[i * 3 + 2] * (1 + displacement / radius);
+
+                    positions[i * 3] += (targetX - positions[i * 3]) * springFactor;
+                    positions[i * 3 + 1] += (targetY - positions[i * 3 + 1]) * springFactor;
+                    positions[i * 3 + 2] += (targetZ - positions[i * 3 + 2]) * springFactor;
+
+                    positions[i * 3] = originalPositions[i * 3] + (positions[i * 3] - originalPositions[i * 3]) * dampingFactor;
+                    positions[i * 3 + 1] = originalPositions[i * 3 + 1] + (positions[i * 3 + 1] - originalPositions[i * 3 + 1]) * dampingFactor;
+                    positions[i * 3 + 2] = originalPositions[i * 3 + 2] + (positions[i * 3 + 2] - originalPositions[i * 3 + 2]) * dampingFactor;
+                }
+
+                particles.geometry.attributes.position.needsUpdate = true;
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        init();
+    </script>
+</body>
+</html>

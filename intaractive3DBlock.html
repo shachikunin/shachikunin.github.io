@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>激しく吹き飛ばす3D立方体</title>
+    <style>
+        body { margin: 0; overflow: hidden; background-color: #2a2a2a; }
+        canvas { display: block; }
+        #instructions {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            font-size: 24px;
+            text-align: center;
+            padding: 10px 20px;
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div id="instructions">画面をタッチしてみよう</div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cannon.js/0.6.2/cannon.min.js"></script>
+    <script>
+        // Three.jsのセットアップ
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x2a2a2a);
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // 環境光とメインの光源の追加
+        scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+        const light = new THREE.PointLight(0xffffff, 1, 100);
+        light.position.set(0, 20, 10);
+        scene.add(light);
+
+        // Cannon.jsの世界のセットアップ
+        const world = new CANNON.World();
+        world.gravity.set(0, -9.82, 0);
+
+        // 床の作成（Three.jsとCannon.js）
+        const floorGeometry = new THREE.PlaneGeometry(20, 20);
+        const floorMaterial = new THREE.MeshPhongMaterial({ color: 0x3a3a3a });
+        const floorMesh = new THREE.Mesh(floorGeometry, floorMaterial);
+        floorMesh.rotation.x = -Math.PI / 2;
+        scene.add(floorMesh);
+
+        const floorShape = new CANNON.Plane();
+        const floorBody = new CANNON.Body({ mass: 0 });
+        floorBody.addShape(floorShape);
+        floorBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2);
+        world.addBody(floorBody);
+
+        // 立方体の配列
+        const cubes = [];
+        const bodies = [];
+
+        // 柔らかい色を生成する関数
+        function getSoftColor() {
+            const hue = Math.random() * 360;
+            return new THREE.Color(`hsl(${hue}, 70%, 70%)`);
+        }
+
+        // 立方体を作成する関数
+        function createCube() {
+            const size = Math.random() * 0.8 + 0.4;
+            const geometry = new THREE.BoxGeometry(size, size, size);
+            const material = new THREE.MeshPhongMaterial({ color: getSoftColor() });
+            const mesh = new THREE.Mesh(geometry, material);
+            scene.add(mesh);
+
+            const shape = new CANNON.Box(new CANNON.Vec3(size/2, size/2, size/2));
+            const body = new CANNON.Body({
+                mass: 1,
+                shape: shape,
+                position: new CANNON.Vec3(Math.random() * 8 - 4, 15, Math.random() * 8 - 4)
+            });
+            world.addBody(body);
+
+            cubes.push(mesh);
+            bodies.push(body);
+
+            if (cubes.length > 100) {
+                const oldMesh = cubes.shift();
+                const oldBody = bodies.shift();
+                scene.remove(oldMesh);
+                world.remove(oldBody);
+            }
+        }
+
+        camera.position.set(0, 10, 20);
+        camera.lookAt(0, 0, 0);
+
+        // クリック位置を3D空間に変換する関数
+        function getClickPosition(event) {
+            const mouse = new THREE.Vector2();
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+            const raycaster = new THREE.Raycaster();
+            raycaster.setFromCamera(mouse, camera);
+
+            const intersects = raycaster.intersectObject(floorMesh);
+            if (intersects.length > 0) {
+                return intersects[0].point;
+            }
+            return null;
+        }
+
+        // クリックイベントリスナー
+        renderer.domElement.addEventListener('click', (event) => {
+            const clickPosition = getClickPosition(event);
+            if (clickPosition) {
+                applyBlastForce(clickPosition);
+            }
+        });
+
+        // 爆発力を適用する関数
+        function applyBlastForce(position) {
+            const blastRadius = 8;
+            const blastForce = 50;
+
+            bodies.forEach((body) => {
+                const distance = body.position.distanceTo(new CANNON.Vec3(position.x, position.y, position.z));
+                if (distance < blastRadius) {
+                    const force = blastForce * (1 - distance / blastRadius);
+                    const direction = new CANNON.Vec3()
+                        .copy(body.position)
+                        .vsub(new CANNON.Vec3(position.x, position.y, position.z))
+                        .unit();
+                    
+                    direction.y += 0.5;
+                    direction.normalize();
+
+                    body.applyImpulse(direction.scale(force), body.position);
+
+                    const rotationForce = new CANNON.Vec3(
+                        Math.random() - 0.5,
+                        Math.random() - 0.5,
+                        Math.random() - 0.5
+                    ).scale(10);
+                    body.angularVelocity.vadd(rotationForce, body.angularVelocity);
+                }
+            });
+        }
+
+        // アニメーションループ
+        function animate() {
+            requestAnimationFrame(animate);
+
+            if (Math.random() < 0.1) {
+                createCube();
+            }
+
+            world.step(1 / 60);
+
+            for (let i = 0; i < cubes.length; i++) {
+                cubes[i].position.copy(bodies[i].position);
+                cubes[i].quaternion.copy(bodies[i].quaternion);
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        // ウィンドウのリサイズ処理
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        animate();
+    </script>
+</body>
+</html>

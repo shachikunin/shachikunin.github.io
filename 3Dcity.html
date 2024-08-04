@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emoji 3D City</title>
+    <style>
+        body { margin: 0; }
+        canvas { display: block; }
+        #controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .button-row {
+            display: flex;
+            margin-bottom: 10px;
+        }
+        .control-button {
+            width: 60px;
+            height: 60px;
+            margin: 0 5px;
+            border: none;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.5);
+            font-size: 24px;
+            cursor: pointer;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .control-button:active {
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+    </style>
+</head>
+<body>
+    <div id="controls">
+        <div class="button-row">
+            <button id="forward" class="control-button">⬆️</button>
+        </div>
+        <div class="button-row">
+            <button id="left" class="control-button">⬅️</button>
+            <button id="backward" class="control-button">⬇️</button>
+            <button id="right" class="control-button">➡️</button>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        let scene, camera, renderer, player;
+		const moveSpeed = 0.1;
+		const objects = [];
+		const cars = [];
+		const keys = {};
+		const mapSize = 100;
+		const playerRadius = 1;
+		const roadWidth = 8;
+		const laneWidth = 2.5;
+
+		const buildingEmojis = ['🏠', '🏢', '🏣', '🏥', '🏦', '🏨', '🏛️', '⛪', '🕌', '🕍', '🏯', '🏰'];
+		const treeEmojis = ['🌳', '🌴', '🌵'];
+		const carEmojis = ['🚗', '🚕', '🚙', '🚌', '🚑', '🚓'];
+
+		let hitboxesVisible = false;
+		let gameTime = 0;
+		let stars;
+		let ambientLight, directionalLight;
+		// 街灯の配列を保持する変数
+		let streetLamps = [];
+		
+        // 移動のための変数
+        let moveForward = false;
+        let moveBackward = false;
+        let moveLeft = false;
+        let moveRight = false;
+
+		function init() {
+		    scene = new THREE.Scene();
+		    scene.fog = new THREE.Fog(0x000000, 0.1, 2000);
+
+		    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+		    renderer = new THREE.WebGLRenderer({ antialias: true });
+		    renderer.setSize(window.innerWidth, window.innerHeight);
+		    document.body.appendChild(renderer.domElement);
+
+		    player = new THREE.Group();
+		    player.position.set(0, 1.7, 0);
+		    scene.add(player);
+		    player.add(camera);
+
+		    createLights();
+		    createGround();
+		    createRoads();
+		    createBuildings();
+		    createTrees();
+		    createCars();
+		    createStreetLamps();
+		    createInstructions();
+		    createClock();
+		    createStars();
+		    addKeyboardListeners();
+		    addButtonListeners();
+		    
+		    saveBaseColors();
+
+		    document.addEventListener('keydown', onKeyDown);
+		    document.addEventListener('keyup', onKeyUp);
+		    window.addEventListener('resize', onWindowResize);
+
+		    animate();
+		}
+
+        function createGround() {
+		    const groundGeometry = new THREE.PlaneGeometry(mapSize, mapSize);
+		    const groundMaterial = new THREE.MeshLambertMaterial({ color: 0x8aad57 });
+		    const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+		    ground.rotation.x = -Math.PI / 2;
+		    scene.add(ground);
+		}
+
+        function createRoads() {
+		    const roadMaterial = new THREE.MeshLambertMaterial({ 
+		        color: 0x444444,
+		        emissive: 0x222222,
+		        emissiveIntensity: 0.2
+		    });
+
+		    const roadPositions = [-25, 0, 25];
+
+		    roadPositions.forEach(pos => {
+		        // Horizontal roads
+		        const horizontalRoadGeometry = new THREE.BoxGeometry(mapSize, 0.1, roadWidth);
+		        const horizontalRoad = new THREE.Mesh(horizontalRoadGeometry, roadMaterial);
+		        horizontalRoad.position.set(0, 0.05, pos);
+		        scene.add(horizontalRoad);
+
+		        // Vertical roads
+		        const verticalRoadGeometry = new THREE.BoxGeometry(roadWidth, 0.1, mapSize);
+		        const verticalRoad = new THREE.Mesh(verticalRoadGeometry, roadMaterial);
+		        verticalRoad.position.set(pos, 0.05, 0);
+		        scene.add(verticalRoad);
+
+		        // Road markings
+		        createRoadMarkings(pos, true);
+		        createRoadMarkings(pos, false);
+		    });
+
+		    // Intersections
+		    roadPositions.forEach(x => {
+		        roadPositions.forEach(z => {
+		            const intersectionGeometry = new THREE.BoxGeometry(roadWidth, 0.12, roadWidth);
+		            const intersectionMaterial = new THREE.MeshLambertMaterial({ 
+		                color: 0x3a3a3a,
+		                emissive: 0x1a1a1a,
+		                emissiveIntensity: 0.2
+		            });
+		            const intersection = new THREE.Mesh(intersectionGeometry, intersectionMaterial);
+		            intersection.position.set(x, 0.06, z);
+		            scene.add(intersection);
+		        });
+		    });
+		}
+
+        function createRoadMarkings(position, isHorizontal) {
+		    const markingMaterial = new THREE.MeshLambertMaterial({ 
+		        color: 0xffffff,
+		        emissive: 0xffffff,
+		        emissiveIntensity: 0.5
+		    });
+		    const markingGeometry = new THREE.BoxGeometry(isHorizontal ? 1 : 0.1, 0.11, isHorizontal ? 0.1 : 1);
+		    
+		    for (let i = -mapSize / 2; i < mapSize / 2; i += 5) {
+		        const marking = new THREE.Mesh(markingGeometry, markingMaterial);
+		        if (isHorizontal) {
+		            marking.position.set(i, 0.05, position);
+		        } else {
+		            marking.position.set(position, 0.05, i);
+		        }
+		        scene.add(marking);
+		    }
+
+		    // Center line
+		    const centerLineGeometry = new THREE.BoxGeometry(isHorizontal ? mapSize : 0.2, 0.11, isHorizontal ? 0.2 : mapSize);
+		    const centerLine = new THREE.Mesh(centerLineGeometry, markingMaterial);
+		    centerLine.position.set(isHorizontal ? 0 : position, 0.05, isHorizontal ? position : 0);
+		    scene.add(centerLine);
+		}
+
+        function createBuildings() {
+            for (let i = 0; i < 80; i++) {
+                createEmojiObject(buildingEmojis, 2, 8);
+            }
+        }
+
+        function createTrees() {
+            for (let i = 0; i < 120; i++) {
+                createEmojiObject(treeEmojis, 1, 2);
+            }
+        }
+
+        function createEmojiObject(emojiList, minScale, maxScale) {
+		    const emoji = emojiList[Math.floor(Math.random() * emojiList.length)];
+		    const canvas = document.createElement('canvas');
+		    const context = canvas.getContext('2d');
+		    canvas.width = 64;
+		    canvas.height = 64;
+		    context.font = '60px serif';
+		    context.textAlign = 'center';
+		    context.textBaseline = 'middle';
+		    context.fillStyle = 'black';
+		    context.fillText(emoji, 32, 32);
+
+		    const texture = new THREE.CanvasTexture(canvas);
+		    const material = new THREE.SpriteMaterial({ 
+		        map: texture,
+		    });
+		    const sprite = new THREE.Sprite(material);
+
+		    const scale = Math.random() * (maxScale - minScale) + minScale;
+		    sprite.scale.set(scale, scale, 1);
+
+		    const halfMapSize = mapSize / 2;
+		    const halfRoadWidth = roadWidth / 2;
+		    let x, z;
+		    do {
+		        x = Math.random() * (mapSize - 5) - halfMapSize + 2.5;
+		        z = Math.random() * (mapSize - 5) - halfMapSize + 2.5;
+		    } while (
+		        Math.abs(x - 25) < halfRoadWidth + scale / 2 ||
+		        Math.abs(x) < halfRoadWidth + scale / 2 ||
+		        Math.abs(x + 25) < halfRoadWidth + scale / 2 ||
+		        Math.abs(z - 25) < halfRoadWidth + scale / 2 ||
+		        Math.abs(z) < halfRoadWidth + scale / 2 ||
+		        Math.abs(z + 25) < halfRoadWidth + scale / 2
+		    );
+
+		    sprite.position.set(x, scale / 2, z);
+
+		    const hitboxGeometry = new THREE.BoxGeometry(scale, scale, scale);
+		    const hitboxMaterial = new THREE.MeshBasicMaterial({ 
+		        color: 0xff0000,
+		        transparent: true,
+		        opacity: 0.3
+		    });
+		    const hitbox = new THREE.Mesh(hitboxGeometry, hitboxMaterial);
+		    hitbox.position.copy(sprite.position);
+		    hitbox.visible = hitboxesVisible;
+
+		    scene.add(sprite);
+		    scene.add(hitbox);
+		    objects.push({ sprite, hitbox });
+		}
+
+        function createCars() {
+            const roadPositions = [-25, 0, 25];
+            roadPositions.forEach(pos => {
+                for (let i = 0; i < 4; i++) {
+                    createCar(pos, true);
+                    createCar(pos, false);
+                }
+            });
+        }
+
+        function createCar(roadPosition, isHorizontal) {
+            const emoji = carEmojis[Math.floor(Math.random() * carEmojis.length)];
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            canvas.width = 64;
+            canvas.height = 64;
+            context.font = '60px serif';
+            context.textAlign = 'center';
+            context.textBaseline = 'middle';
+            context.fillText(emoji, 32, 32);
+
+            const texture = new THREE.CanvasTexture(canvas);
+            const material = new THREE.SpriteMaterial({ map: texture });
+            const sprite = new THREE.Sprite(material);
+
+            const scale = 2;
+            sprite.scale.set(scale, scale, 1);
+
+            const direction = Math.random() < 0.5 ? 1 : -1;
+            const lane = direction > 0 ? -laneWidth : laneWidth;
+            const halfMapSize = mapSize / 2;
+
+            if (isHorizontal) {
+                sprite.position.set(-halfMapSize * direction, scale / 2, roadPosition + lane);
+            } else {
+                sprite.position.set(roadPosition + lane, scale / 2, -halfMapSize * direction);
+            }
+
+            const hitboxGeometry = new THREE.BoxGeometry(scale, scale, scale);
+		    const hitboxMaterial = new THREE.MeshBasicMaterial({ 
+		        color: 0x00ff00,
+		        transparent: true,
+		        opacity: 0.3
+		    });
+		    const hitbox = new THREE.Mesh(hitboxGeometry, hitboxMaterial);
+		    hitbox.position.copy(sprite.position);
+		    hitbox.visible = hitboxesVisible;
+
+		    scene.add(sprite);
+		    scene.add(hitbox);
+		    cars.push({ sprite, hitbox, isHorizontal, direction, speed: Math.random() * 0.05 + 0.05, roadPosition });
+		}
+		
+		function createClock() {
+		    const clockDiv = document.createElement('div');
+		    clockDiv.id = 'clock';
+		    clockDiv.style.position = 'absolute';
+		    clockDiv.style.top = '10px';
+		    clockDiv.style.right = '10px';
+		    clockDiv.style.color = 'white';
+		    clockDiv.style.fontFamily = 'Arial, sans-serif';
+		    clockDiv.style.fontSize = '20px';
+		    clockDiv.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+		    clockDiv.style.padding = '10px';
+		    clockDiv.style.borderRadius = '5px';
+		    document.body.appendChild(clockDiv);
+		}
+
+		function updateClock() {
+		    const hours = Math.floor(gameTime) % 24;
+		    const minutes = Math.floor((gameTime % 1) * 60);
+		    document.getElementById('clock').textContent = 
+		        `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+		}
+		
+		function createLights() {
+		    ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+		    scene.add(ambientLight);
+
+		    directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+		    directionalLight.position.set(0, 10, 0);
+		    scene.add(directionalLight);
+		}
+		
+		function updateLights() {
+		    const hours = gameTime % 24;
+		    let lightIntensity, nightMix;
+
+		    if (hours >= 7 && hours < 16) {
+		        // 日中 (7:00 - 15:59)
+		        lightIntensity = 1;
+		        nightMix = 0;
+		    } else if (hours >= 20 || hours < 5) {
+		        // 夜間 (20:00 - 4:59)
+		        lightIntensity = 0.5;
+		        nightMix = 0.7;
+		    } else {
+		        // 朝夕の遷移期間
+		        if (hours >= 16) {
+		            // 夕方から夜 (16:00 - 19:59)
+		            const t = (hours - 16) / 4;
+		            lightIntensity = lerp(1, 0.5, t);
+		            nightMix = lerp(0, 0.7, t);
+		        } else {
+		            // 夜明け (5:00 - 6:59)
+		            const t = (hours - 5) / 2;
+		            lightIntensity = lerp(0.5, 1, t);
+		            nightMix = lerp(0.7, 0, t);
+		        }
+		    }
+
+		    ambientLight.intensity = lightIntensity;
+		    directionalLight.intensity = lightIntensity;
+
+		    // 全てのオブジェクトの色を更新
+		    scene.traverse(function(object) {
+		        if (object.material && object.material.color) {
+		            const baseColor = object.material.userData.baseColor || object.material.color.clone();
+		            const nightColor = new THREE.Color(0x334455);
+		            object.material.color.copy(baseColor).lerp(nightColor, nightMix);
+		        }
+		    });
+		}
+
+		function updateSkyColor() {
+		    const hours = gameTime % 24;
+		    let skyColor;
+
+		    if (hours >= 7 && hours < 16) {
+		        // 昼
+		        skyColor = new THREE.Color(0x87CEEB);
+		    } else if (hours >= 16 && hours < 18) {
+		        // 夕方
+		        const t = (hours - 16) / 2;
+		        skyColor = new THREE.Color(0x87CEEB).lerp(new THREE.Color(0xD4B0B5), t);
+		    } else if (hours >= 18 && hours < 20) {
+		        // 日没
+		        const t = (hours - 18) / 2;
+		        skyColor = new THREE.Color(0xD4B0B5).lerp(new THREE.Color(0x000033), t);
+		    } else if (hours >= 20 || hours < 5) {
+		        // 夜
+		        skyColor = new THREE.Color(0x000033);
+		    } else {
+		        // 夜明け (5:00 - 7:00)
+		        const t = (hours - 5) / 2;
+		        skyColor = new THREE.Color(0x000033).lerp(new THREE.Color(0x87CEEB), t);
+		    }
+
+		    scene.background = skyColor;
+		    if (hours >= 20 || hours < 5) {
+		        // 夜間はフォグを薄く
+		        scene.fog.near = 1000;
+		        scene.fog.far = 4000;
+		    } else {
+		        // 日中はフォグを濃く
+		        scene.fog.near = 100;
+		        scene.fog.far = 1000;
+		    }
+		    scene.fog.color.copy(skyColor);
+		}
+		
+		function saveBaseColors() {
+		    scene.traverse(function(object) {
+		        if (object.material && object.material.color) {
+		            object.material.userData.baseColor = object.material.color.clone();
+		        }
+		    });
+		}
+
+		function lerp(start, end, amt) {
+		    return (1 - amt) * start + amt * end;
+		}
+
+		function createStars() {
+		    const geometry = new THREE.BufferGeometry();
+		    const vertices = [];
+
+		    for (let i = 0; i < 10000; i++) {
+		        const x = (Math.random() - 0.5) * 5000;  // 範囲を広げる
+		        const y = Math.random() * 500 + 200;   // より高く配置
+		        const z = (Math.random() - 0.5) * 5000;  // 範囲を広げる
+		        vertices.push(x, y, z);
+		    }
+
+		    geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+
+		    const material = new THREE.PointsMaterial({
+		        color: 0xffffff,
+		        size: 2,  // サイズを大きくして見やすくする
+		        transparent: true,
+		        opacity: 0
+		    });
+
+		    stars = new THREE.Points(geometry, material);
+		    scene.add(stars);
+		}
+
+		function updateStars() {
+		    const hours = gameTime % 24;
+		    let starOpacity;
+
+		    if (hours >= 7 && hours < 16) {
+		        // 日中
+		        starOpacity = 0;
+		    } else if (hours >= 20 || hours < 5) {
+		        // 夜間
+		        starOpacity = 1;
+		    } else {
+		        // 朝夕の遷移期間
+		        if (hours >= 16) {
+		            // 夕方から夜 (16:00 - 19:59)
+		            starOpacity = (hours - 16) / 4;
+		        } else {
+		            // 夜明け (5:00 - 6:59)
+		            starOpacity = 1 - (hours - 5) / 2;
+		        }
+		    }
+
+		    stars.material.opacity = starOpacity;
+		}
+		
+		// 街灯を作成する関数
+		function createStreetLamps() {
+		    const roadPositions = [-25, 0, 25];
+		    const halfRoadWidth = roadWidth / 2;
+
+		    roadPositions.forEach(x => {
+		        roadPositions.forEach(z => {
+		            // 交差点の四隅に街灯を配置
+		            createStreetLamp(x - halfRoadWidth, z - halfRoadWidth);
+		            createStreetLamp(x - halfRoadWidth, z + halfRoadWidth);
+		            createStreetLamp(x + halfRoadWidth, z - halfRoadWidth);
+		            createStreetLamp(x + halfRoadWidth, z + halfRoadWidth);
+		        });
+		    });
+		}
+
+		// 個々の街灯を作成する関数
+		function createStreetLamp(x, z) {
+		    const streetLamp = new THREE.Group();
+
+		    // 柱の作成
+		    const poleGeometry = new THREE.CylinderGeometry(0.2, 0.2, 5, 8);
+		    const poleMaterial = new THREE.MeshLambertMaterial({ color: 0x404040 });
+		    const pole = new THREE.Mesh(poleGeometry, poleMaterial);
+		    pole.position.set(0, 2.5, 0);
+		    streetLamp.add(pole);
+
+		    // ランプ部分の作成
+		    const lampGeometry = new THREE.SphereGeometry(0.5, 16, 16);
+		    const lampMaterial = new THREE.MeshLambertMaterial({ 
+		        color: 0xffff00,
+		        emissive: 0xffff00,
+		        emissiveIntensity: 0
+		    });
+		    const lamp = new THREE.Mesh(lampGeometry, lampMaterial);
+		    lamp.position.set(0, 5, 0);  // 柱の上に配置
+		    streetLamp.add(lamp);
+
+		    // スポットライトを追加
+		    const spotLight = new THREE.SpotLight(0xffffff, 0, 15, Math.PI / 4, 0.5, 2);
+		    spotLight.position.set(0, 5, 0);  // ランプと同じ高さに
+		    spotLight.target.position.set(0, 0, 0);
+		    streetLamp.add(spotLight);
+		    streetLamp.add(spotLight.target);
+
+		    // 街灯全体の位置を設定
+		    streetLamp.position.set(x, 0, z);
+
+		    scene.add(streetLamp);
+		    streetLamps.push(streetLamp);
+		}
+
+		// 街灯の明るさを更新する関数
+		function updateStreetLamps() {
+		    const hours = gameTime % 24;
+		    let lampIntensity;
+
+		    if (hours >= 19 || hours < 6) {
+		        // 夜間 (19:00 - 5:59)
+		        lampIntensity = 1;
+		    } else if (hours >= 17 && hours < 19) {
+		        // 夕方 (17:00 - 18:59)
+		        lampIntensity = (hours - 17) / 2;
+		    } else if (hours >= 6 && hours < 8) {
+		        // 朝方 (6:00 - 7:59)
+		        lampIntensity = 1 - (hours - 6) / 2;
+		    } else {
+		        // 日中
+		        lampIntensity = 0;
+		    }
+
+		    streetLamps.forEach(streetLamp => {
+		        const lamp = streetLamp.children[1];  // ランプは2番目の子要素
+		        lamp.material.emissiveIntensity = lampIntensity;
+
+		        const spotLight = streetLamp.children[2];  // スポットライトは3番目の子要素
+		        spotLight.intensity = lampIntensity;
+		    });
+		}
+
+		function createInstructions() {
+		    const instructionsDiv = document.createElement('div');
+		    instructionsDiv.style.position = 'absolute';
+		    instructionsDiv.style.top = '10px';
+		    instructionsDiv.style.left = '10px';
+		    instructionsDiv.style.color = 'white';
+		    instructionsDiv.style.fontFamily = 'Arial, sans-serif';
+		    instructionsDiv.style.fontSize = '14px';
+		    instructionsDiv.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+		    instructionsDiv.style.padding = '10px';
+		    instructionsDiv.style.borderRadius = '5px';
+		    instructionsDiv.innerHTML = `
+		        操作方法:<br>
+		        ↑: 前進<br>
+		        ↓: 後退<br>
+		        ←: 左回転<br>
+		        →: 右回転<br>
+		        Space: 当たり判定表示切替
+		    `;
+		    document.body.appendChild(instructionsDiv);
+		}
+
+        function onKeyDown(event) {
+		    keys[event.key] = true;
+		    if (event.key === ' ') {
+		        hitboxesVisible = !hitboxesVisible;
+		        toggleHitboxes();
+		    }
+		}
+
+        function onKeyUp(event) {
+            keys[event.key] = false;
+        }
+
+		function toggleHitboxes() {
+		    objects.forEach(obj => {
+		        obj.hitbox.visible = hitboxesVisible;
+		    });
+		    cars.forEach(car => {
+		        car.hitbox.visible = hitboxesVisible;
+		    });
+		}
+
+        function checkCollision() {
+		    const playerPosition = player.position;
+		    for (const object of objects) {
+		        const distance = new THREE.Vector2(playerPosition.x, playerPosition.z)
+		            .distanceTo(new THREE.Vector2(object.hitbox.position.x, object.hitbox.position.z));
+		        if (distance < (object.hitbox.scale.x / 2 + playerRadius)) {
+		            return true;
+		        }
+		    }
+		    return false;
+		}
+
+        function isOutOfBounds() {
+            const halfMapSize = mapSize / 2 - playerRadius;
+            return Math.abs(player.position.x) > halfMapSize || Math.abs(player.position.z) > halfMapSize;
+        }
+
+        function moveCars() {
+		    for (const car of cars) {
+		        if (car.isHorizontal) {
+		            car.sprite.position.x += car.direction * car.speed;
+		            car.hitbox.position.x += car.direction * car.speed;
+		            if (Math.abs(car.sprite.position.x) > mapSize / 2) {
+		                car.sprite.position.x = -car.direction * mapSize / 2;
+		                car.hitbox.position.x = -car.direction * mapSize / 2;
+		            }
+		        } else {
+		            car.sprite.position.z += car.direction * car.speed;
+		            car.hitbox.position.z += car.direction * car.speed;
+		            if (Math.abs(car.sprite.position.z) > mapSize / 2) {
+		                car.sprite.position.z = -car.direction * mapSize / 2;
+		                car.hitbox.position.z = -car.direction * mapSize / 2;
+		            }
+		        }
+
+		        const playerPosition = player.position;
+		        const distance = new THREE.Vector2(playerPosition.x, playerPosition.z)
+		            .distanceTo(new THREE.Vector2(car.hitbox.position.x, car.hitbox.position.z));
+		        
+		        if (distance < (car.hitbox.scale.x / 2 + playerRadius)) {
+		            if (car.isHorizontal) {
+		                player.position.x = car.hitbox.position.x + car.direction * (car.hitbox.scale.x / 2 + playerRadius);
+		            } else {
+		                player.position.z = car.hitbox.position.z + car.direction * (car.hitbox.scale.x / 2 + playerRadius);
+		            }
+		        }
+		    }
+		}
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+        
+        // キーボード操作のイベントリスナーを追加
+		function addKeyboardListeners() {
+		    document.addEventListener('keydown', onKeyDown);
+		    document.addEventListener('keyup', onKeyUp);
+		}
+
+		function onKeyDown(event) {
+		    switch (event.code) {
+		        case 'ArrowUp':
+		        case 'KeyW':
+		            moveForward = true;
+		            break;
+		        case 'ArrowLeft':
+		        case 'KeyA':
+		            moveLeft = true;
+		            break;
+		        case 'ArrowDown':
+		        case 'KeyS':
+		            moveBackward = true;
+		            break;
+		        case 'ArrowRight':
+		        case 'KeyD':
+		            moveRight = true;
+		            break;
+		    }
+		}
+
+		function onKeyUp(event) {
+		    switch (event.code) {
+		        case 'ArrowUp':
+		        case 'KeyW':
+		            moveForward = false;
+		            break;
+		        case 'ArrowLeft':
+		        case 'KeyA':
+		            moveLeft = false;
+		            break;
+		        case 'ArrowDown':
+		        case 'KeyS':
+		            moveBackward = false;
+		            break;
+		        case 'ArrowRight':
+		        case 'KeyD':
+		            moveRight = false;
+		            break;
+		    }
+		}
+        
+        // ボタン操作のイベントリスナーを追加
+        function addButtonListeners() {
+		    const buttons = {
+		        'forward': { element: document.getElementById('forward'), move: () => moveForward = true, stop: () => moveForward = false },
+		        'backward': { element: document.getElementById('backward'), move: () => moveBackward = true, stop: () => moveBackward = false },
+		        'left': { element: document.getElementById('left'), move: () => moveLeft = true, stop: () => moveLeft = false },
+		        'right': { element: document.getElementById('right'), move: () => moveRight = true, stop: () => moveRight = false }
+		    };
+
+		    for (const [key, button] of Object.entries(buttons)) {
+		        button.element.addEventListener('mousedown', button.move);
+		        button.element.addEventListener('mouseup', button.stop);
+		        button.element.addEventListener('mouseleave', button.stop);
+		        button.element.addEventListener('touchstart', (e) => { e.preventDefault(); button.move(); });
+		        button.element.addEventListener('touchend', (e) => { e.preventDefault(); button.stop(); });
+		    }
+		}
+
+        // プレイヤーの移動処理を更新
+        function movePlayer(delta) {
+            const speed = 4.0; // 移動速度
+            const rotationSpeed = 2.0; // 回転速度
+
+            if (moveForward) player.translateZ(-speed * delta);
+		    if (moveBackward) player.translateZ(speed * delta);
+		    if (moveLeft) player.rotateY(rotationSpeed * delta);
+		    if (moveRight) player.rotateY(-rotationSpeed * delta);
+
+		    // 衝突検出と境界チェック
+		    if (checkCollision() || isOutOfBounds()) {
+		        player.position.copy(playerPreviousPosition);
+		    } else {
+		        playerPreviousPosition.copy(player.position);
+		    }
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            const delta = clock.getDelta(); // 前のフレームからの経過時間
+
+            movePlayer(delta);
+		    moveCars();
+		    gameTime += 1 / (60 * 3); // 1分 = 0.1秒 (より遅いサイクル)
+		    updateClock();
+		    updateSkyColor();
+		    updateStreetLamps();
+		    updateLights();
+		    updateStars();
+		    renderer.clear();
+		    renderer.render(scene, camera);
+		}
+
+        // グローバルスコープにclock変数を追加
+        const clock = new THREE.Clock();
+
+        // プレイヤーの前の位置を保存する変数
+        const playerPreviousPosition = new THREE.Vector3();
+
+        init();
+        animate();
+    </script>
+</body>
+</html>

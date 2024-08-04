@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube 3D Transform</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;700&display=swap');
+        
+        body, html {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #f0f0f0;
+            font-family: 'Arial', sans-serif;
+        }
+        .title-container {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        .title {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #333;
+            margin: 0;
+            position: relative;
+            display: inline-block;
+        }
+        .title::before, .title::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 25px;
+            height: 25px;
+            background-color: #ff6b6b;
+            border-radius: 50%;
+            transform: translateY(-50%);
+        }
+        .title::before {
+            left: -35px;
+        }
+        .title::after {
+            right: -35px;
+        }
+        .subtitle {
+            font-size: 1.1rem;
+            color: #666;
+            margin-top: 0.5rem;
+            font-weight: 300;
+        }
+        .container {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        input[type="text"] {
+            width: 300px;
+            padding: 10px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .video-container {
+            perspective: 1000px;
+            margin-top: 20px;
+        }
+        iframe {
+            width: 560px;
+            height: 315px;
+            border: none;
+            transition: transform 0.1s ease;
+        }
+        .error-message {
+            color: red;
+            margin-top: 10px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .error-message.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="title-container">
+        <h1 class="title">3Dで動画を見よう</h1>
+        <p class="subtitle">YoutubeのURL入れると変形しながら動画が見れるよ（再生できない動画もあります）</p>
+    </div>
+    <div class="container">
+        <input type="text" id="urlInput" placeholder="YouTube URLを入力">
+        <button id="updateButton">更新</button>
+        <div id="errorMessage" class="error-message">正しいYouTubeのURLを入力してください</div>
+    </div>
+    <div class="video-container">
+        <iframe id="video" src="https://www.youtube.com/embed/dummy" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+    </div>
+
+    <script>
+        document.addEventListener('mousemove', (event) => {
+            const video = document.getElementById('video');
+            const rect = video.getBoundingClientRect();
+            const x = ((event.clientX - (rect.left + rect.width / 2)) / rect.width) * 14;
+            const y = ((event.clientY - (rect.top + rect.height / 2)) / rect.height) * 14;
+
+            video.style.transform = `rotateY(${x}deg) rotateX(${-y}deg)`;
+        });
+
+        document.getElementById('updateButton').addEventListener('click', () => {
+            const urlInput = document.getElementById('urlInput').value;
+            const errorMessage = document.getElementById('errorMessage');
+            const video = document.getElementById('video');
+            const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+
+            const match = urlInput.match(youtubeRegex);
+            if (match && match[1]) {
+                const videoId = match[1];
+                video.src = `https://www.youtube.com/embed/${videoId}`;
+                errorMessage.classList.remove('show');
+            } else {
+                errorMessage.classList.add('show');
+            }
+        });
+    </script>
+</body>
+</html>

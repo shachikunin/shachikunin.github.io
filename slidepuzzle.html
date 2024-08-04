@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4x4 画像スライドパズル</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        #puzzle-container {
+            display: grid;
+            grid-template-columns: repeat(4, 100px);
+            grid-gap: 2px;
+            margin-top: 20px;
+            position: relative;
+            width: 408px;
+            height: 408px;
+        }
+        .puzzle-piece {
+            width: 100px;
+            height: 100px;
+            border: 1px solid #ccc;
+            cursor: pointer;
+            background-size: 400px 400px;
+            position: absolute;
+            transition: all 0.3s ease;
+        }
+        #message, #timer {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>4x4 画像スライドパズル</h1>
+    <input type="file" id="image-upload" accept="image/*">
+    <button id="start-game">ゲーム開始</button>
+    <div id="timer">時間: 00:00</div>
+    <div id="puzzle-container"></div>
+    <div id="message"></div>
+
+    <script>
+        const puzzleContainer = document.getElementById('puzzle-container');
+        const imageUpload = document.getElementById('image-upload');
+        const startGameButton = document.getElementById('start-game');
+        const messageElement = document.getElementById('message');
+        const timerElement = document.getElementById('timer');
+        let pieces = [];
+        let emptyIndex = 15;
+        let imageUrl = '';
+        let currentOrder = [];
+        let startTime;
+        let timerInterval;
+
+        imageUpload.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            imageUrl = URL.createObjectURL(file);
+        });
+
+        startGameButton.addEventListener('click', startGame);
+
+        function startGame() {
+            if (!imageUrl) {
+                alert('画像をアップロードしてください。');
+                return;
+            }
+
+            puzzleContainer.innerHTML = '';
+            pieces = [];
+            currentOrder = Array.from({length: 16}, (_, i) => i);
+
+            for (let i = 0; i < 16; i++) {
+                const piece = document.createElement('div');
+                piece.classList.add('puzzle-piece');
+                piece.style.backgroundImage = `url(${imageUrl})`;
+                piece.style.backgroundPosition = `${-(i % 4) * 100}px ${-Math.floor(i / 4) * 100}px`;
+                piece.addEventListener('click', () => movePiece(i));
+                puzzleContainer.appendChild(piece);
+                pieces.push(piece);
+                updatePiecePosition(i);
+            }
+
+            emptyIndex = 15;
+            pieces[emptyIndex].style.backgroundImage = 'none';
+            pieces[emptyIndex].style.backgroundColor = '#fff';
+
+            shufflePuzzle();
+            messageElement.textContent = '';
+            startTimer();
+        }
+
+        function shufflePuzzle() {
+            for (let i = 0; i < 1000; i++) {
+                const adjacentIndices = getAdjacentIndices(emptyIndex);
+                const randomIndex = adjacentIndices[Math.floor(Math.random() * adjacentIndices.length)];
+                swapPieces(emptyIndex, randomIndex);
+                emptyIndex = randomIndex;
+            }
+        }
+
+        function getAdjacentIndices(index) {
+            const adjacent = [];
+            if (index % 4 !== 0) adjacent.push(index - 1);  // left
+            if (index % 4 !== 3) adjacent.push(index + 1);  // right
+            if (index >= 4) adjacent.push(index - 4);       // up
+            if (index < 12) adjacent.push(index + 4);       // down
+            return adjacent;
+        }
+
+        function movePiece(index) {
+            const pieceIndex = currentOrder.indexOf(index);
+            const adjacentIndices = getAdjacentIndices(emptyIndex);
+            if (adjacentIndices.includes(pieceIndex)) {
+                swapPieces(pieceIndex, emptyIndex);
+                emptyIndex = pieceIndex;
+                checkWin();
+            }
+        }
+
+        function swapPieces(index1, index2) {
+            [currentOrder[index1], currentOrder[index2]] = [currentOrder[index2], currentOrder[index1]];
+            updatePiecePosition(index1);
+            updatePiecePosition(index2);
+        }
+
+        function updatePiecePosition(index) {
+            const piece = pieces[currentOrder[index]];
+            piece.style.left = `${(index % 4) * 102}px`;
+            piece.style.top = `${Math.floor(index / 4) * 102}px`;
+        }
+
+        function checkWin() {
+            if (currentOrder.every((value, index) => value === index)) {
+                stopTimer();
+                const timeElapsed = getTimeElapsed();
+                messageElement.textContent = `クリア！おめでとうございます！タイム: ${timeElapsed}`;
+            }
+        }
+
+        function startTimer() {
+            startTime = new Date();
+            timerInterval = setInterval(updateTimer, 1000);
+        }
+
+        function stopTimer() {
+            clearInterval(timerInterval);
+        }
+
+        function updateTimer() {
+            const timeElapsed = getTimeElapsed();
+            timerElement.textContent = `時間: ${timeElapsed}`;
+        }
+
+        function getTimeElapsed() {
+            const now = new Date();
+            const elapsedTime = now - startTime;
+            const minutes = Math.floor(elapsedTime / 60000);
+            const seconds = Math.floor((elapsedTime % 60000) / 1000);
+            return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+    </script>
+</body>
+</html>

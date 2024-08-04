@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>物理演算する絵文字アニメーション（強重力、高弾性、自動クリア機能付き）</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            overflow: hidden;
+            background-color: #f0f0f0;
+        }
+        #container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+        .emoji {
+            position: absolute;
+            user-select: none;
+            transform-origin: center;
+        }
+        #clearButton {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 1000;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        #emojiCount {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 1000;
+            padding: 10px;
+            font-size: 16px;
+            background-color: rgba(255, 255, 255, 0.7);
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <button id="clearButton">クリア</button>
+        <div id="emojiCount">絵文字の数: 0</div>
+    </div>
+
+    <script>
+        const container = document.getElementById('container');
+        const clearButton = document.getElementById('clearButton');
+        const emojiCountElement = document.getElementById('emojiCount');
+        const minEmojiSize = 16;
+        const maxEmojiSize = 48;
+        let emojiCount = 0;
+
+        const emojis = [
+            ...Array(58).fill().map((_, i) => String.fromCodePoint(0x1f600 + i)),
+            ...Array(28).fill().map((_, i) => String.fromCodePoint(0x1f480 + i)),
+            ...Array(67).fill().map((_, i) => String.fromCodePoint(0x1f330 + i)),
+            ...Array(111).fill().map((_, i) => String.fromCodePoint(0x1f680 + i))
+        ];
+
+        const { Engine, Render, Runner, Bodies, Composite, Body, World } = Matter;
+
+        const engine = Engine.create();
+        engine.world.gravity.y = 1.5;  // 重力を大きく設定
+
+        const render = Render.create({
+            element: container,
+            engine: engine,
+            options: {
+                width: container.clientWidth,
+                height: container.clientHeight,
+                wireframes: false,
+                background: 'transparent'
+            }
+        });
+
+        const wallThickness = 50;
+        let bottomWall;
+
+        function createWalls() {
+            return [
+                Bodies.rectangle(container.clientWidth / 2, -wallThickness / 2, container.clientWidth, wallThickness, { isStatic: true }),
+                Bodies.rectangle(-wallThickness / 2, container.clientHeight / 2, wallThickness, container.clientHeight, { isStatic: true }),
+                Bodies.rectangle(container.clientWidth + wallThickness / 2, container.clientHeight / 2, wallThickness, container.clientHeight, { isStatic: true })
+            ];
+        }
+
+        function createBottomWall() {
+            return Bodies.rectangle(container.clientWidth / 2, container.clientHeight + wallThickness / 2, container.clientWidth, wallThickness, { isStatic: true });
+        }
+
+        let walls = createWalls();
+        bottomWall = createBottomWall();
+        Composite.add(engine.world, [...walls, bottomWall]);
+
+        Render.run(render);
+        const runner = Runner.create();
+        Runner.run(runner, engine);
+
+        function createEmoji() {
+            const emojiChar = emojis[Math.floor(Math.random() * emojis.length)];
+            const emojiSize = Math.random() * (maxEmojiSize - minEmojiSize) + minEmojiSize;
+            const x = Math.random() * (container.clientWidth - emojiSize) + emojiSize / 2;
+            const y = -emojiSize / 2;
+
+            const emojiBody = Bodies.circle(x, y, emojiSize / 2, {
+                restitution: 0.9,  // 弾性係数を大きく設定
+                friction: 0.005,
+                render: {
+                    fillStyle: 'transparent'
+                }
+            });
+
+            const emojiElement = document.createElement('div');
+            emojiElement.className = 'emoji';
+            emojiElement.textContent = emojiChar;
+            emojiElement.style.fontSize = `${emojiSize}px`;
+            container.appendChild(emojiElement);
+
+            emojiBody.element = emojiElement;
+            emojiBody.emojiSize = emojiSize;
+
+            Body.setVelocity(emojiBody, { x: (Math.random() - 0.5) * 4, y: Math.random() * 2 });
+
+            Composite.add(engine.world, emojiBody);
+            emojiCount++;
+            updateEmojiCount();
+        }
+
+        function updateEmojiPositions() {
+            const bodies = Composite.allBodies(engine.world);
+            bodies.forEach(body => {
+                if (body.element) {
+                    body.element.style.left = `${body.position.x - body.emojiSize / 2}px`;
+                    body.element.style.top = `${body.position.y - body.emojiSize / 2}px`;
+                    body.element.style.transform = `rotate(${body.angle}rad)`;
+
+                    if (body.position.y > container.clientHeight + body.emojiSize) {
+                        World.remove(engine.world, body);
+                        body.element.remove();
+                        emojiCount--;
+                        updateEmojiCount();
+                    }
+                }
+            });
+
+            if (emojiCount >= 100) {
+                clearEmojis();
+            }
+
+            requestAnimationFrame(updateEmojiPositions);
+        }
+
+        function updateEmojiCount() {
+            emojiCountElement.textContent = `絵文字の数: ${emojiCount}`;
+        }
+
+        function spawnEmoji() {
+            createEmoji();
+            setTimeout(spawnEmoji, 500 + Math.random() * 1000);
+        }
+
+        function clearEmojis() {
+            World.remove(engine.world, bottomWall);
+
+            setTimeout(() => {
+                const bodies = Composite.allBodies(engine.world);
+                bodies.forEach(body => {
+                    if (body.element) {
+                        World.remove(engine.world, body);
+                        body.element.remove();
+                    }
+                });
+                emojiCount = 0;
+                updateEmojiCount();
+
+                bottomWall = createBottomWall();
+                World.add(engine.world, bottomWall);
+            }, 3000);
+        }
+
+        clearButton.addEventListener('click', clearEmojis);
+
+        spawnEmoji();
+        updateEmojiPositions();
+
+        window.addEventListener('resize', () => {
+            render.canvas.width = container.clientWidth;
+            render.canvas.height = container.clientHeight;
+            Matter.Render.setPixelRatio(render, window.devicePixelRatio);
+
+            Composite.remove(engine.world, walls);
+            Composite.remove(engine.world, bottomWall);
+            walls = createWalls();
+            bottomWall = createBottomWall();
+            Composite.add(engine.world, [...walls, bottomWall]);
+        });
+    </script>
+</body>
+</html>

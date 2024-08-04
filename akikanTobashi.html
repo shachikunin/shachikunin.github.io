@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Emoji Bounce Game</title>
+    <style>
+        canvas {
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #f9f9f9;
+        }
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+        }
+        #score {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 24px;
+            color: #fff;
+            z-index: 1000; /* Ensure score is visible over the canvas */
+        }
+    </style>
+</head>
+<body>
+    <canvas></canvas>
+    <div id="score">Score: 0</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/matter-js@0.17.1"></script>
+    <script>
+        var Engine = Matter.Engine,
+            Runner = Matter.Runner,
+            Render = Matter.Render,
+            World = Matter.World,
+            Bodies = Matter.Bodies,
+            Body = Matter.Body,
+            Events = Matter.Events;
+
+        var engine = Engine.create({
+            gravity: {
+                y: 0.1
+            }
+        });
+        var runner = Runner.create();
+        var render = Render.create({
+            element: document.body,
+            engine: engine,
+            canvas: document.querySelector('canvas'),
+            options: {
+                width: window.innerWidth,
+                height: window.innerHeight,
+                wireframes: false
+            }
+        });
+
+        var score = 0;
+        var gameOver = false;
+
+        function updateScore() {
+            document.getElementById('score').textContent = 'Score: ' + score;
+        }
+
+        function setupGame() {
+            World.clear(engine.world);
+            Engine.clear(engine);
+            score = 0;
+            gameOver = false;
+            updateScore();
+
+            var ground = Bodies.rectangle(window.innerWidth / 2, window.innerHeight, window.innerWidth, 60, { 
+                isStatic: true,
+                label: 'Ground'
+            });
+            var leftWall = Bodies.rectangle(0, window.innerHeight / 2, 50, window.innerHeight, {
+                isStatic: true,
+                restitution: 1.0
+            });
+            var rightWall = Bodies.rectangle(window.innerWidth, window.innerHeight / 2, 50, window.innerHeight, {
+                isStatic: true,
+                restitution: 1.0
+            });
+
+            World.add(engine.world, [ground, leftWall, rightWall]);
+            createEmoji();  // 最初のEmojiを生成
+        }
+
+        function createEmoji() {
+            if (gameOver) return;
+            var emoji = Bodies.circle(Math.random() * window.innerWidth, -30, 30, {
+                label: 'Emoji',
+                restitution: 0.6
+            });
+            World.add(engine.world, emoji);
+        }
+
+        window.addEventListener('mousedown', function(event) {
+            if (gameOver) return;
+            var mouseX = event.clientX, mouseY = event.clientY;
+            var bodies = Matter.Query.point(engine.world.bodies, { x: mouseX, y: mouseY });
+            bodies.forEach(function(body) {
+                if (body.label === 'Emoji') {
+                    var randomX = (Math.random() - 0.5) * 0.02; // Adjusted for slight randomness
+                    Body.applyForce(body, { x: body.position.x, y: body.position.y }, { x: randomX, y: -0.1 }); // Adjust upward force
+                    score += 100 * Matter.Composite.allBodies(engine.world).filter(b => b.label === 'Emoji').length;
+                    updateScore();
+                }
+            });
+        });
+
+        Events.on(engine, 'collisionStart', function(event) {
+            event.pairs.forEach(function(pair) {
+                if (pair.bodyA.label === 'Ground' && pair.bodyB.label === 'Emoji' ||
+                    pair.bodyB.label === 'Ground' && pair.bodyA.label === 'Emoji') {
+                    gameOver = true;
+                    setTimeout(function() {
+                        if (confirm('ここまで！スコアは ' + score + ' でした。続けますか？')) {
+                            setupGame();
+                        }
+                    }, 100);
+                }
+            });
+        });
+
+        // カスタムテキストレンダリングの追加
+        Render.looksLike = function(render) {
+            var context = render.context;
+            context.font = '60px Arial';
+            Matter.Events.on(render, 'afterRender', function() {
+                var bodies = Matter.Composite.allBodies(engine.world);
+                bodies.forEach(function(body) {
+                    if (body.label === 'Emoji') {
+                        context.fillText('🥫', body.position.x - 30, body.position.y + 20);
+                    }
+                });
+            });
+        };
+
+        setupGame();
+        setInterval(createEmoji, 5000);  // 🥫の生成間隔を5秒に設定
+
+        Runner.run(runner, engine);
+        Render.run(render);
+        Render.looksLike(render);
+    </script>
+</body>
+</html>
