@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>価格タグジェネレーター</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kaisei+Decol:wght@700&family=RocknRoll+One&family=Mochiy+Pop+One&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Kaisei Decol', serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        input, textarea, button {
+            display: block;
+            width: 100%;
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-family: 'Kaisei Decol', serif;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #previewArea {
+            margin-top: 20px;
+            text-align: center;
+        }
+        #previewArea canvas {
+            max-width: 100%;
+            height: auto;
+        }
+        #downloadLink {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        #downloadLink:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>価格タグジェネレーター</h1>
+        <input type="text" id="productName" placeholder="商品名">
+        <textarea id="productDescription" placeholder="商品概要（オプション）" rows="3"></textarea>
+        <input type="number" id="price" placeholder="価格">
+        <button onclick="generatePriceTag()">価格タグを生成</button>
+        <button onclick="generateSoldOutTag()">完売タグを生成</button>
+        <div id="previewArea"></div>
+    </div>
+
+    <script>
+        function generateTag(isSoldOut = false) {
+            const canvas = document.createElement('canvas');
+            const scale = 2; // 高解像度のため2倍に
+            canvas.width = 3.4 * 96 * scale;
+            canvas.height = 2.1 * 96 * scale;
+            const ctx = canvas.getContext('2d');
+            ctx.scale(scale, scale);
+            
+            // Background
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Border
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(5, 5, canvas.width / scale - 10, canvas.height / scale - 10);
+            
+            ctx.textAlign = 'center';
+            
+            const productName = document.getElementById('productName').value;
+            const productDescription = document.getElementById('productDescription').value;
+            
+            // Product Name (Kaisei Decol Bold) with gradient marker
+            ctx.fillStyle = '#000000';
+            ctx.font = 'bold 24px "Kaisei Decol"';
+            const maxWidth = canvas.width / scale - 40;
+            let y = 40;
+            const nameMetrics = ctx.measureText(productName);
+            const nameWidth = Math.min(nameMetrics.width, maxWidth);
+            
+            // Draw gradient marker for product name
+            drawGradientMarker(ctx, (canvas.width / scale - nameWidth) / 2, y - 5, nameWidth, 10, '#FFD700', '#FFA500', 0.6);
+            
+            y = wrapText(ctx, productName, canvas.width / (2 * scale), y, maxWidth, 30);
+
+            // Product Description (if provided)
+            if (productDescription) {
+                ctx.font = '16px "Kaisei Decol"';
+                y += 20;
+                y = wrapText(ctx, productDescription, canvas.width / (2 * scale), y - 25, maxWidth, 20);
+            }
+            
+            if (isSoldOut) {
+                ctx.font = '24px "Mochiy Pop One"';
+                ctx.fillStyle = '#FF0000';
+                ctx.fillText('完売しました！', canvas.width / (2 * scale), canvas.height / (2 * scale) + 20);
+                
+                ctx.fillStyle = '#000000';
+                ctx.font = '20px "Mochiy Pop One"';
+                const soldOutMessage = 'お買い上げいただき\nありがとうございます。';
+                wrapText(ctx, soldOutMessage, canvas.width / (2 * scale), canvas.height / (2 * scale) + 50, maxWidth, 30);
+            } else {
+                const price = document.getElementById('price').value;
+                
+                // Price (Cormorant Garamond) with gradient marker
+                ctx.fillStyle = '#000000';
+                ctx.font = 'bold 100px "RocknRoll One"';
+                const priceText = `¥${price}`;
+                const priceMetrics = ctx.measureText(priceText);
+                
+                // Draw gradient marker for price
+                drawGradientMarker(ctx, (canvas.width / scale - priceMetrics.width) / 2, canvas.height / scale - 45, priceMetrics.width, 16, '#FFD700', '#FFA500', 0.6);
+                
+                ctx.fillText(priceText, canvas.width / (2 * scale), canvas.height / scale - 30);
+            }
+            
+            return canvas;
+        }
+
+        function drawGradientMarker(ctx, x, y, width, height, color1, color2, alpha) {
+            ctx.save();
+            ctx.globalAlpha = alpha;
+            const gradient = ctx.createLinearGradient(x, y, x + width, y);
+            gradient.addColorStop(0, color1);
+            gradient.addColorStop(1, color2);
+            ctx.fillStyle = gradient;
+            ctx.fillRect(x, y, width, height);
+            ctx.restore();
+        }
+
+        function wrapText(context, text, x, y, maxWidth, lineHeight) {
+            const lines = text.split('\n');
+            for (let i = 0; i < lines.length; i++) {
+                const words = lines[i].split('');
+                let line = '';
+
+                for (let n = 0; n < words.length; n++) {
+                    const testLine = line + words[n];
+                    const metrics = context.measureText(testLine);
+                    const testWidth = metrics.width;
+                    if (testWidth > maxWidth && n > 0) {
+                        context.fillText(line, x, y);
+                        line = words[n];
+                        y += lineHeight;
+                    } else {
+                        line = testLine;
+                    }
+                }
+                context.fillText(line, x, y);
+                y += lineHeight;
+            }
+            return y;
+        }
+
+        function displayAndOfferDownload(canvas, fileName) {
+            const previewArea = document.getElementById('previewArea');
+            previewArea.innerHTML = '';
+            previewArea.appendChild(canvas);
+
+            const downloadLink = document.createElement('a');
+            downloadLink.href = canvas.toDataURL('image/png');
+            downloadLink.download = fileName;
+            downloadLink.textContent = 'ダウンロード';
+            downloadLink.id = 'downloadLink';
+            previewArea.appendChild(downloadLink);
+        }
+
+        function generatePriceTag() {
+            const canvas = generateTag();
+            displayAndOfferDownload(canvas, 'price_tag.png');
+        }
+
+        function generateSoldOutTag() {
+            const canvas = generateTag(true);
+            displayAndOfferDownload(canvas, 'sold_out_tag.png');
+        }
+    </script>
+</body>
+</html>
