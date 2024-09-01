@@ -186,14 +186,29 @@
         function displayAndOfferDownload(canvas, fileName) {
             const previewArea = document.getElementById('previewArea');
             previewArea.innerHTML = '';
-            previewArea.appendChild(canvas);
 
+            // Canvasを画像に変換
+            const imageDataUrl = canvas.toDataURL('image/png');
+
+            // img要素を作成して表示
+            const img = document.createElement('img');
+            img.src = imageDataUrl;
+            img.id = 'generatedImage';
+            img.alt = '生成された価格タグ';
+            previewArea.appendChild(img);
+
+            // ダウンロードリンクの作成（PCユーザー向け）
             const downloadLink = document.createElement('a');
-            downloadLink.href = canvas.toDataURL('image/png');
+            downloadLink.href = imageDataUrl;
             downloadLink.download = fileName;
-            downloadLink.textContent = 'ダウンロード';
+            downloadLink.textContent = 'ダウンロード（PC用）';
             downloadLink.id = 'downloadLink';
             previewArea.appendChild(downloadLink);
+
+            // モバイルユーザー向けの説明を追加
+            const mobileInstructions = document.createElement('p');
+            mobileInstructions.textContent = 'モバイル端末をご使用の場合は、画像を長押しして保存してください。';
+            previewArea.appendChild(mobileInstructions);
         }
 
         function generatePriceTag() {
