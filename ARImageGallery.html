@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AR Card with Enhanced Slide Animation</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aframe/1.2.0/aframe.min.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap" rel="stylesheet">
+    
+    <style>
+        .arjs-loader {
+            position: fixed;
+            z-index: 999;
+            overflow: show;
+            margin: auto;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            width: 50px;
+            height: 50px;
+        }
+
+        #clickOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body style="margin: 0;">
+    <div id="clickOverlay"></div>
+
+    <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
+        <a-assets>
+            <!-- メイン画像 -->
+            <img id="image1" src="https://dl.dropboxusercontent.com/scl/fi/b2tlbezkwb7k49saaki3e/illust_8.png?rlkey=21kq8m6sb0r7wd5tcef6ihhyr&st=acfjc4ap" crossorigin="anonymous">
+            <img id="image2" src="https://dl.dropboxusercontent.com/scl/fi/mi9wprr5ngwjrj01ulp4a/illust_9.png?rlkey=gvfbmi1iq6umh72t4tdexwgfl&st=tehnrvrx" crossorigin="anonymous">
+            <img id="image3" src="https://dl.dropboxusercontent.com/scl/fi/v4u997tawq20x3shkeoz2/illust_10.png?rlkey=bdixxkwt8ohc0jmimfiq6awxw&st=8j57hzeu" crossorigin="anonymous">
+            <img id="image4" src="https://dl.dropboxusercontent.com/scl/fi/lzaho2pddwdins8ogkvsl/illust_11.png?rlkey=vv341t8z2yhml0tdjysuznop0&st=agtegwp0" crossorigin="anonymous">
+            <!-- ソーシャルアイコン -->
+            <img id="icon-pixiv" src="https://dl.dropboxusercontent.com/scl/fi/uvz6dso76er7ifm0m6bck/pixiv_icon.png?rlkey=iqxjkxweuy7c2xljp46yyd3en&st=ktpwdwv4" crossorigin="anonymous">
+            <img id="icon-twitter" src="https://dl.dropboxusercontent.com/scl/fi/2se13ckzl7ppf8y11pq5l/X_icon.png?rlkey=bfzgoyrs0vftg9i0cqklhdrqd&st=h8ghx4d9" crossorigin="anonymous">
+            <img id="icon-homepage" src="https://dl.dropboxusercontent.com/scl/fi/qsd7fbancvi4jtcmepok5/hp_icon.png?rlkey=1drxt4y5z3a8my2uoi7ta59zo&st=tus04acq" crossorigin="anonymous">
+            
+        </a-assets>
+
+        <a-marker preset="custom" type="pattern" url="https://dl.dropboxusercontent.com/scl/fi/jd39tmvnt0d1vf26g8vas/pattern-AR.patt?rlkey=ti8kv2rla0qq26csqkcpnt43l&st=08ij4jdu">
+            <a-entity id="container" position="0 0 0" rotation="-90 0 0" tilt-shine>
+                <a-entity id="imageFrame" position="0 0.7 0">
+                    <a-entity id="slideContainer" position="0 0 0.001">
+                        <!-- 左側の画像 //画像数変更時に#srcを変える-->
+                        <a-plane
+                            id="leftImage"
+                            position="-1.5 0 0"
+                            width="1.4"
+                            height="2"
+                            material="shader: flat; src: #image4; transparent: true; opacity: 0">
+                        </a-plane>
+                        <!-- 中央の画像 -->
+                        <a-plane
+                            id="currentImage"
+                            position="0 0 0"
+                            width="1.4"
+                            height="2"
+                            material="shader: flat; src: #image1; transparent: true; opacity: 1">
+                        </a-plane>
+                        <!-- 右側の画像 -->
+                        <a-plane
+                            id="rightImage"
+                            position="1.5 0 0"
+                            width="1.4"
+                            height="2"
+                            material="shader: flat; src: #image2; transparent: true; opacity: 1">
+                        </a-plane>
+                    </a-entity>
+
+                    <!-- 注釈テキストの背景 -->
+                    <a-plane
+                        id="noteBackground"
+                        position="0 -0.8 0.2"
+                        width="1.4"
+                        height="0.3"
+                        material="shader: flat; color: #000000; opacity: 0.5; transparent: true">
+                    </a-plane>
+
+                    <!-- 注釈テキスト -->
+                    <a-text
+                        id="noteText"
+                        position="0 -0.8 0.4"
+                        value="Triangle."
+                        align="center"
+                        width="2"
+                        color="#ffffff"
+                        opacity="1"
+                        wrapCount="20"
+                        font="Noto Sans JP"
+                        style="font-family: 'Noto Sans JP', sans-serif">
+                    </a-text>
+
+                    <a-plane
+                        id="shineLayer"
+                        position="0 0 0.1"
+                        width="1.4"
+                        height="2"
+                        material="shader: standard; 
+                                 color: #ffffff;
+                                 opacity: 0.5; 
+                                 transparent: true; 
+                                 metalness: 1.0; 
+                                 roughness: 0.1;
+                                 emissive: #ffffff;
+                                 emissiveIntensity: 2.0">
+                    </a-plane>
+                </a-entity>
+
+                <a-entity id="textContainer" position="0 1.8 0.1">
+                </a-entity>
+                
+                <!-- ソーシャルアイコン -->
+                <a-entity id="socialIcons" position="0 -1 0">
+                    <a-plane id="icon-pixiv-plane"
+                            position="-0.6 0 0"
+                            width="0.4"
+                            height="0.4"
+                            material="shader: flat; src: #icon-pixiv; transparent: true"
+                            class="clickable"
+                            data-url="https://www.pixiv.net/users/43712965"></a-plane>
+                    <a-plane id="icon-twitter-plane"
+                            position="0 0 0"
+                            width="0.4"
+                            height="0.4"
+                            material="shader: flat; src: #icon-twitter; transparent: true"
+                            class="clickable"
+                            data-url="https://twitter.com/Jblx_xldLo0"></a-plane>
+                    <a-plane id="icon-homepage-plane"
+                            position="0.6 0 0"
+                            width="0.4"
+                            height="0.4"
+                            material="shader: flat; src: #icon-homepage; transparent: true"
+                            class="clickable"
+                            data-url="https://shachikunin.github.io/"></a-plane>
+                </a-entity>
+            </a-entity>
+        </a-marker>
+
+        <a-entity camera></a-entity>
+    </a-scene>
+
+    <script>
+        AFRAME.registerComponent('tilt-shine', {
+            schema: {
+                animationDuration: { default: 1000 }
+            },
+
+            init: function() {
+                this.lastRotation = { x: -90, y: 0, z: 0 };
+                this.shineLayer = this.el.querySelector('#shineLayer');
+                this.baseRotation = -90;
+                this.textData = [
+                    { 
+                        title: "兎田ぺこら", 
+                        note: "こんぺこー！兎田ぺこらぺこ～！",
+                        noteColor: "#65baea",
+                        noteOpacity: 0.7,
+                        font: "#noto-sans-font"
+                    },
+                    { 
+                        title: "不知火フレア", 
+                        note: "こんぬい～！不知火フレアだよ～！",
+                        noteColor: "#dc3813",
+                        noteOpacity: 0.7,
+                        font: "#noto-sans-font"
+                    },
+                    { 
+                        title: "白銀ノエル", 
+                        note: "こんまっする～！白銀聖騎士団の団長、白銀ノエルです！",
+                        noteColor: "#89939d",
+                        noteOpacity: 0.7,
+                        font: "#noto-sans-font"
+                    },
+                    { 
+                        title: "宝鐘マリン", 
+                        note: "Ahoy!宝鐘海賊団船長！宝鐘マリンです～！",
+                        noteColor: "#a72413",
+                        noteOpacity: 0.7,
+                        font: "#noto-sans-font"
+                    },//画像数変更時に変える
+                ];
+                this.letterEntities = [];
+                this.setupImageTransition();
+                this.isTransitioning = false;
+
+                // ARマーカーの検出イベントリスナーを追加
+                const marker = document.querySelector('a-marker');
+                marker.addEventListener('markerFound', () => {
+                    // マーカー検出時に初期テキストを表示
+                    this.createInitialText();
+                    this.updateNoteText(0);
+                    this.updateNoteWindow(0);
+                    // フェードインアニメーション
+                    this.fadeInNote();
+                });
+
+                const overlay = document.getElementById('clickOverlay');
+                overlay.addEventListener('click', () => {
+                    const marker = document.querySelector('a-marker');
+                    if (!marker || !marker.object3D.visible || this.isTransitioning) return;
+
+                    // マーカーの位置を画面座標に変換
+                    const markerPosition = this.getScreenPosition(marker.object3D);
+                    if (!markerPosition) return;
+
+                    // クリック位置を正規化
+                    const rect = event.target.getBoundingClientRect();
+                    const clickX = event.clientX - rect.left;
+                    const clickY = event.clientY - rect.top;
+                    
+                    // 画像フレームの位置を取得
+                    const imageFrame = this.el.querySelector('#imageFrame');
+                    const framePosition = this.getScreenPosition(imageFrame.object3D);
+                    if (!framePosition) return;
+
+                    // マーカーのスケールを考慮した画像サイズの計算
+                    const scale = this.getMarkerScale(marker);
+                    const imageWidth = 1.4 * scale * 200;  // スケールを大きくして判定領域を広げる
+                    const imageHeight = 2 * scale * 200;   // スケールを大きくして判定領域を広げる
+
+                    // 画像の領域を計算
+                    const imageLeft = framePosition.x - imageWidth / 2;
+                    const imageRight = framePosition.x + imageWidth / 2;
+                    const imageTop = framePosition.y - imageHeight / 2;
+                    const imageBottom = framePosition.y + imageHeight / 2;
+
+                    // クリック判定（少し余裕を持たせる）
+                    const margin = 20; // ピクセル単位での判定余裕
+                    if (clickX >= imageLeft - margin && clickX <= imageRight + margin && 
+                        clickY >= imageTop - margin && clickY <= imageBottom + margin) {
+                        this.transitionToNextImage();
+                    }
+
+                    // ソーシャルアイコンのクリック判定
+                    //console.log("icon click.");
+                    const socialIcons = this.el.querySelector('#socialIcons');
+                    const icons = socialIcons.querySelectorAll('.clickable');
+                    icons.forEach(icon => {
+                        if (this.isClickOnElement(clickX, clickY, icon, 0.4, 0.4)) {
+                            const url = icon.getAttribute('data-url');
+                            window.open(url, '_blank');
+                        }
+                    });
+                });
+            },
+
+            updateNoteWindow: function(index) {
+                const noteBackground = this.el.querySelector('#noteBackground');
+                if (noteBackground) {
+                    const { noteColor, noteOpacity } = this.textData[index];
+                    noteBackground.setAttribute('material', {
+                        shader: 'flat',
+                        color: noteColor,
+                        opacity: 0, // フェードインのため初期値は0
+                        transparent: true
+                    });
+                    // アニメーションで色を変更
+                    this.animateNoteWindowColor(noteBackground, noteColor, noteOpacity);
+                }
+            },
+
+            animateNoteWindowColor: function(element, targetColor, targetOpacity) {
+                const duration = this.data.animationDuration;
+                let startTime = null;
+                const startColor = new THREE.Color(element.getAttribute('material').color);
+                const endColor = new THREE.Color(targetColor);
+
+                const animate = (currentTime) => {
+                    if (!startTime) startTime = currentTime;
+                    const elapsed = currentTime - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+                    const easedProgress = this.easeOutCubic(progress);
+
+                    // 色の補間
+                    const currentColor = new THREE.Color(
+                        startColor.r + (endColor.r - startColor.r) * easedProgress,
+                        startColor.g + (endColor.g - startColor.g) * easedProgress,
+                        startColor.b + (endColor.b - startColor.b) * easedProgress
+                    );
+
+                    // 不透明度の補間
+                    const currentOpacity = targetOpacity * easedProgress;
+
+                    element.setAttribute('material', {
+                        color: `#${currentColor.getHexString()}`,
+                        opacity: currentOpacity
+                    });
+
+                    if (progress < 1) {
+                        requestAnimationFrame(animate);
+                    }
+                };
+
+                requestAnimationFrame(animate);
+            },
+
+            isClickOnElement: function(clickX, clickY, element, width, height) {
+                const position = this.getScreenPosition(element.object3D);
+                if (!position) return false;
+
+                const scale = this.getMarkerScale(document.querySelector('a-marker'));
+                const elementWidth = width * scale * 250;
+                const elementHeight = height * scale * 250;
+                const margin = 20;
+
+                const left = position.x - elementWidth / 2;
+                const right = position.x + elementWidth / 2;
+                const top = position.y - elementHeight / 2;
+                const bottom = position.y + elementHeight / 2;
+
+                if (this.debugMode) {
+                    this.visualizeClickArea(left, top, elementWidth, elementHeight);
+                }
+
+                return (
+                    clickX >= left - margin &&
+                    clickX <= right + margin &&
+                    clickY >= top - margin &&
+                    clickY <= bottom + margin
+                );
+            },
+
+            visualizeClickArea: function(left, top, width, height) {
+                const id = `debug-${Date.now()}`;
+                let debugElement = document.getElementById(id);
+                if (!debugElement) {
+                    debugElement = document.createElement('div');
+                    debugElement.id = id;
+                    debugElement.style.position = 'absolute';
+                    debugElement.style.border = '2px solid red';
+                    debugElement.style.pointerEvents = 'none';
+                    debugElement.style.zIndex = '9999';
+                    document.body.appendChild(debugElement);
+
+                    // 2秒後に削除
+                    setTimeout(() => {
+                        debugElement.remove();
+                    }, 2000);
+                }
+
+                debugElement.style.left = `${left}px`;
+                debugElement.style.top = `${top}px`;
+                debugElement.style.width = `${width}px`;
+                debugElement.style.height = `${height}px`;
+            },
+            
+            getMarkerScale: function(marker) {
+                const scale = new THREE.Vector3();
+                marker.object3D.getWorldScale(scale);
+                return Math.max(scale.x, scale.y, scale.z);
+            },
+
+            getScreenPosition: function(object3D) {
+                const vector = new THREE.Vector3();
+                const widthHalf = window.innerWidth / 2;
+                const heightHalf = window.innerHeight / 2;
+                
+                // オブジェクトのワールド位置を取得
+                object3D.getWorldPosition(vector);
+                
+                // カメラの視点を考慮した位置計算
+                const camera = document.querySelector('a-entity[camera]').object3D.children[0];
+                vector.project(camera);
+                
+                return {
+                    x: (vector.x * widthHalf) + widthHalf,
+                    y: -(vector.y * heightHalf) + heightHalf
+                };
+            },
+
+            updateNoteText: function(index) {
+                const noteText = this.el.querySelector('#noteText');
+                if (noteText) {
+                    noteText.setAttribute('value', this.textData[index].note);
+                }
+            },
+            
+            fadeInNote: function() {
+                const duration = this.data.animationDuration / 2;
+                let startTime = null;
+
+                const noteBackground = this.el.querySelector('#noteBackground');
+                const noteText = this.el.querySelector('#noteText');
+                const targetOpacity = this.textData[this.currentImageIndex].noteOpacity;
+
+                const animate = (currentTime) => {
+                    if (!startTime) startTime = currentTime;
+                    const elapsed = currentTime - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+
+                    const backgroundOpacity = progress * 0.5;
+                    const textOpacity = progress;
+
+                    const currentMaterial = noteBackground.getAttribute('material');
+                    noteBackground.setAttribute('material', {
+                        ...currentMaterial,
+                        opacity: backgroundOpacity
+                    });
+                    noteText.setAttribute('opacity', textOpacity);
+
+                    if (progress < 1) {
+                        requestAnimationFrame(animate);
+                    }
+                };
+
+                requestAnimationFrame(animate);
+            },
+
+            setupImageTransition: function() {
+                this.imageIndices = [1, 2, 3, 4];//画像数変更時に変える
+                this.currentImageIndex = 0;
+                this.slideContainer = this.el.querySelector('#slideContainer');
+                this.leftImage = this.el.querySelector('#leftImage');
+                this.currentImage = this.el.querySelector('#currentImage');
+                this.rightImage = this.el.querySelector('#rightImage');
+
+                // 初期表示の設定
+                this.updateImageSources();
+            },
+
+            updateImageSources: function() {
+                const total = this.imageIndices.length;
+                const prevIndex = (this.currentImageIndex - 1 + total) % total;
+                const nextIndex = (this.currentImageIndex + 1) % total;
+
+                this.leftImage.setAttribute('material', {
+                    src: `#image${this.imageIndices[prevIndex]}`,
+                    opacity: 1
+                });
+                this.currentImage.setAttribute('material', {
+                    src: `#image${this.imageIndices[this.currentImageIndex]}`,
+                    opacity: 1
+                });
+                this.rightImage.setAttribute('material', {
+                    src: `#image${this.imageIndices[nextIndex]}`,
+                    opacity: 1
+                });
+            },
+
+            fadeInRightImage: function() {
+                const duration = this.data.animationDuration / 2;
+                let startTime = null;
+
+                const animate = (currentTime) => {
+                    if (!startTime) startTime = currentTime;
+                    const elapsed = currentTime - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+
+                    this.rightImage.setAttribute('material', 'opacity', progress);
+
+                    if (progress < 1) {
+                        requestAnimationFrame(animate);
+                    }
+                };
+
+                requestAnimationFrame(animate);
+            },
+
+            transitionToNextImage: function() {
+                if (this.isTransitioning) return;
+                this.isTransitioning = true;
+
+                const nextIndex = (this.currentImageIndex + 1) % this.imageIndices.length;
+                const afterNextIndex = (nextIndex + 1) % this.imageIndices.length;
+                const duration = this.data.animationDuration;
+                let startTime = null;
+
+                // アニメーション開始前の準備
+                // 現在の画像のソースを保存
+                const currentLeftSrc = this.leftImage.getAttribute('material').src;
+                const currentCenterSrc = this.currentImage.getAttribute('material').src;
+                const currentRightSrc = this.rightImage.getAttribute('material').src;
+
+                // スライドコンテナの参照を取得
+                const slideContainer = this.el.querySelector('#slideContainer');
+
+                // 新しい右側の画像を作成
+                const newRightImage = document.createElement('a-plane');
+                newRightImage.setAttribute('width', '1.4');
+                newRightImage.setAttribute('height', '2');
+                newRightImage.setAttribute('material', {
+                    shader: 'flat',
+                    src: `#image${this.imageIndices[afterNextIndex]}`,
+                    transparent: true,
+                    opacity: 0
+                });
+                // 初期位置を設定
+                newRightImage.setAttribute('position', '3 0 0');
+                // スライドコンテナに追加
+                slideContainer.appendChild(newRightImage);
+
+                const animate = (currentTime) => {
+                    if (!startTime) startTime = currentTime;
+                    const elapsed = currentTime - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+                    const easedProgress = this.easeOutCubic(progress);
+
+                    // 左側の画像のアニメーション（フェードアウトしながら左へ）
+                    this.leftImage.setAttribute('position', `${-1.5 - 1.5 * easedProgress} 0 0`);
+                    this.leftImage.setAttribute('material', {
+                        src: currentLeftSrc,
+                        opacity: Math.max(0, 1 - easedProgress * 2)
+                    });
+
+                    // 中央の画像のアニメーション（左へスライド）
+                    this.currentImage.setAttribute('position', `${-1.5 * easedProgress} 0 0`);
+                    this.currentImage.setAttribute('material', {
+                        src: currentCenterSrc,
+                        opacity: 1
+                    });
+
+                    // 右側の画像のアニメーション（中央へスライド）
+                    this.rightImage.setAttribute('position', `${1.5 - 1.5 * easedProgress} 0 0`);
+                    this.rightImage.setAttribute('material', {
+                        src: currentRightSrc,
+                        opacity: 1
+                    });
+
+                    // 新しい右側の画像のアニメーション（フェードインしながら右から登場）
+                    const newRightX = 3 - 1.5 * easedProgress;
+                    newRightImage.setAttribute('position', `${newRightX} 0 0`);
+                    newRightImage.setAttribute('material', 'opacity', easedProgress);
+
+                    if (progress < 1) {
+                        requestAnimationFrame(animate);
+                    } else {
+                        // アニメーション完了後の処理
+                        this.currentImageIndex = nextIndex;
+
+                        // 一時的に追加した新しい右側の画像を削除
+                        slideContainer.removeChild(newRightImage);
+
+                        // 位置をリセット
+                        this.leftImage.setAttribute('position', '-1.5 0 0');
+                        this.currentImage.setAttribute('position', '0 0 0');
+                        this.rightImage.setAttribute('position', '1.5 0 0');
+
+                        // 画像ソースを更新
+                        this.updateImageSources();
+                        
+                        this.isTransitioning = false;
+                    }
+                };
+
+                requestAnimationFrame(animate);
+                
+                // 注釈テキストの更新を追加
+                this.fadeOutNote(() => {
+                    this.updateNoteText(nextIndex);
+                    this.updateNoteWindow(nextIndex);
+                    this.fadeInNote();
+                });
+                
+                // テキストの更新
+                const nextText = this.textData[nextIndex].title;
+                this.fadeText(false, () => {
+                    this.createAnimatedText(nextText);
+                    this.fadeText(true);
+                });
+            },
+
+            fadeOutNote: function(callback) {
+                const duration = this.data.animationDuration / 2;
+                let startTime = null;
+
+                const noteBackground = this.el.querySelector('#noteBackground');
+                const noteText = this.el.querySelector('#noteText');
+                const currentOpacity = this.textData[this.currentImageIndex].noteOpacity;
+
+                const animate = (currentTime) => {
+                    if (!startTime) startTime = currentTime;
+                    const elapsed = currentTime - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+
+                    const backgroundOpacity = (1 - progress) * 0.5;
+                    const textOpacity = 1 - progress;
+
+                    const currentMaterial = noteBackground.getAttribute('material');
+                    noteBackground.setAttribute('material', {
+                        ...currentMaterial,
+                        opacity: backgroundOpacity
+                    });
+                    noteText.setAttribute('opacity', textOpacity);
+
+                    if (progress < 1) {
+                        requestAnimationFrame(animate);
+                    } else if (callback) {
+                        callback();
+                    }
+                };
+
+                requestAnimationFrame(animate);
+            },
+
+            easeOutCubic: function(x) {
+                return 1 - Math.pow(1 - x, 3);
+            },
+
+            fadeText: function(fadeIn, callback) {
+                const duration = this.data.animationDuration / 2;
+                let startTime = null;
+
+                const animate = (currentTime) => {
+                    if (!startTime) startTime = currentTime;
+                    const elapsed = currentTime - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+
+                    const opacity = fadeIn ? progress : 1 - progress;
+                    this.letterEntities.forEach(letter => {
+                        if (letter && letter.object3D) {
+                            letter.setAttribute('visible', true);
+                            letter.object3D.visible = true;
+                            if (letter.children.length > 0) {
+                                letter.children[0].setAttribute('text', 'opacity', opacity);
+                                letter.children[1].setAttribute('text', 'opacity', opacity * 0.5);
+                            }
+                        }
+                    });
+
+                    if (progress < 1) {
+                        requestAnimationFrame(animate);
+                    } else if (callback) {
+                        callback();
+                    }
+                };
+
+                requestAnimationFrame(animate);
+            },
+
+            createInitialText: function() {
+                        this.createAnimatedText(this.textData[0].title);
+                        // フェードインアニメーションの追加
+                        this.fadeText(true);
+                    },
+
+                    createAnimatedText: function(text) {
+                const container = this.el.querySelector('#textContainer');
+                // 既存のテキストをクリア
+                this.letterEntities.forEach(entity => {
+                    if (entity.parentNode) {
+                        entity.parentNode.removeChild(entity);
+                    }
+                });
+                this.letterEntities = [];
+
+                const letters = text.split('');
+                const letterWidth = 0.08;
+                const totalWidth = letters.length * letterWidth;
+                const startX = -(totalWidth / 2) + (letterWidth / 2);
+
+                letters.forEach((letter, index) => {
+                    const letterEntity = document.createElement('a-entity');
+                    const x = startX + (index * letterWidth);
+                    
+                    const mainText = document.createElement('a-text');
+                    mainText.setAttribute('value', letter);
+                    mainText.setAttribute('align', 'center');
+                    mainText.setAttribute('width', 2);
+                    mainText.setAttribute('color', '#ffffff');
+                    mainText.setAttribute('opacity', 0); // 初期不透明度を0に設定
+                    mainText.setAttribute('font', 'Noto Sans JP'); // フォントを設定
+                    mainText.setAttribute('material', 'shader: standard; metalness: 0.8; roughness: 0.2');
+                    
+                    const shadowText = document.createElement('a-text');
+                    shadowText.setAttribute('value', letter);
+                    shadowText.setAttribute('align', 'center');
+                    shadowText.setAttribute('width', 2);
+                    shadowText.setAttribute('color', '#000000');
+                    shadowText.setAttribute('opacity', 0); // 初期不透明度を0に設定
+                    shadowText.setAttribute('font', 'Noto Sans JP'); // フォントを設定
+                    shadowText.setAttribute('position', '0.01 -0.01 -0.01');
+                    shadowText.setAttribute('material', 'shader: standard; opacity: 0.5');
+
+                    letterEntity.appendChild(mainText);
+                    letterEntity.appendChild(shadowText);
+                    letterEntity.setAttribute('position', `${x} 0 0`);
+                    letterEntity.setAttribute('visible', true);
+                    letterEntity.object3D.visible = true;
+
+                    container.appendChild(letterEntity);
+                    this.letterEntities.push(letterEntity);
+                });
+            },
+
+            tick: function() {
+                const currentRotation = this.el.getAttribute('rotation');
+                const tiltX = (currentRotation.x - this.baseRotation) / 45;
+                const tiltY = currentRotation.y / 45;
+                const totalTilt = Math.abs(tiltX) + Math.abs(tiltY);
+
+                if (this.shineLayer) {
+                    const material = this.shineLayer.getAttribute('material');
+                    material.opacity = Math.min(0.8, totalTilt * 0.6);
+                    material.emissiveIntensity = Math.min(4.0, totalTilt * 2.0 + 1.0);
+                    
+                    const shinePosition = this.shineLayer.getAttribute('position');
+                    shinePosition.x = tiltY * 0.08;
+                    shinePosition.y = 0 - tiltX * 0.08;
+                    
+                    this.shineLayer.setAttribute('material', material);
+                    this.shineLayer.setAttribute('position', shinePosition);
+
+                    const textContainer = this.el.querySelector('#textContainer');
+                    if (textContainer) {
+                        const textPosition = textContainer.getAttribute('position');
+                        textPosition.x = tiltY * 0.1;
+                        textPosition.z = 0.1 + Math.abs(totalTilt) * 0.05;
+                        textContainer.setAttribute('position', textPosition);
+                    }
+                }
+
+                this.lastRotation = {...currentRotation};
+            }
+        });
+
+        const handleImageError = (event) => {
+            console.error('Image loading error:', event);
+            const randomId = Date.now();
+            event.target.src = `https://picsum.photos/400/600?random=${randomId}`;
+        };
+
+        document.querySelectorAll('img').forEach(img => {
+            img.addEventListener('error', handleImageError);
+        });
+    </script>
+</body>
+</html>
