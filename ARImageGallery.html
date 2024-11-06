@@ -4,7 +4,6 @@
     <title>AR Card with Enhanced Slide Animation</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/aframe/1.2.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap" rel="stylesheet">
     
     <style>
         .arjs-loader {
@@ -45,7 +44,6 @@
             <img id="icon-pixiv" src="https://dl.dropboxusercontent.com/scl/fi/uvz6dso76er7ifm0m6bck/pixiv_icon.png?rlkey=iqxjkxweuy7c2xljp46yyd3en&st=ktpwdwv4" crossorigin="anonymous">
             <img id="icon-twitter" src="https://dl.dropboxusercontent.com/scl/fi/2se13ckzl7ppf8y11pq5l/X_icon.png?rlkey=bfzgoyrs0vftg9i0cqklhdrqd&st=h8ghx4d9" crossorigin="anonymous">
             <img id="icon-homepage" src="https://dl.dropboxusercontent.com/scl/fi/qsd7fbancvi4jtcmepok5/hp_icon.png?rlkey=1drxt4y5z3a8my2uoi7ta59zo&st=tus04acq" crossorigin="anonymous">
-            
         </a-assets>
 
         <a-marker preset="custom" type="pattern" url="https://dl.dropboxusercontent.com/scl/fi/jd39tmvnt0d1vf26g8vas/pattern-AR.patt?rlkey=ti8kv2rla0qq26csqkcpnt43l&st=08ij4jdu">
@@ -97,8 +95,8 @@
                         color="#ffffff"
                         opacity="1"
                         wrapCount="20"
-                        font="Noto Sans JP"
-                        style="font-family: 'Noto Sans JP', sans-serif">
+                        font="monoid"
+                        style="font-family: 'Arial Black', Helvetica">
                     </a-text>
 
                     <a-plane
@@ -162,32 +160,28 @@
                 this.baseRotation = -90;
                 this.textData = [
                     { 
-                        title: "兎田ぺこら", 
-                        note: "こんぺこー！兎田ぺこらぺこ～！",
+                        title: "1 / 4", 
+                        note: "Usada Pekora",
                         noteColor: "#65baea",
-                        noteOpacity: 0.7,
-                        font: "#noto-sans-font"
+                        noteOpacity: 0.7
                     },
                     { 
-                        title: "不知火フレア", 
-                        note: "こんぬい～！不知火フレアだよ～！",
+                        title: "2 / 4", 
+                        note: "Shiranui Flare",
                         noteColor: "#dc3813",
-                        noteOpacity: 0.7,
-                        font: "#noto-sans-font"
+                        noteOpacity: 0.7
                     },
                     { 
-                        title: "白銀ノエル", 
-                        note: "こんまっする～！白銀聖騎士団の団長、白銀ノエルです！",
+                        title: "3 / 4", 
+                        note: "Shirogane Noel",
                         noteColor: "#89939d",
-                        noteOpacity: 0.7,
-                        font: "#noto-sans-font"
+                        noteOpacity: 0.7
                     },
                     { 
-                        title: "宝鐘マリン", 
-                        note: "Ahoy!宝鐘海賊団船長！宝鐘マリンです～！",
+                        title: "4 / 4", 
+                        note: "Houshou Marine",
                         noteColor: "#a72413",
-                        noteOpacity: 0.7,
-                        font: "#noto-sans-font"
+                        noteOpacity: 0.7
                     },//画像数変更時に変える
                 ];
                 this.letterEntities = [];
@@ -669,7 +663,6 @@
                     mainText.setAttribute('width', 2);
                     mainText.setAttribute('color', '#ffffff');
                     mainText.setAttribute('opacity', 0); // 初期不透明度を0に設定
-                    mainText.setAttribute('font', 'Noto Sans JP'); // フォントを設定
                     mainText.setAttribute('material', 'shader: standard; metalness: 0.8; roughness: 0.2');
                     
                     const shadowText = document.createElement('a-text');
@@ -678,7 +671,6 @@
                     shadowText.setAttribute('width', 2);
                     shadowText.setAttribute('color', '#000000');
                     shadowText.setAttribute('opacity', 0); // 初期不透明度を0に設定
-                    shadowText.setAttribute('font', 'Noto Sans JP'); // フォントを設定
                     shadowText.setAttribute('position', '0.01 -0.01 -0.01');
                     shadowText.setAttribute('material', 'shader: standard; opacity: 0.5');
 
