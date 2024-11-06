@@ -47,7 +47,6 @@
         </a-assets>
 
         <a-marker preset="custom" type="pattern" url="https://dl.dropboxusercontent.com/scl/fi/jd39tmvnt0d1vf26g8vas/pattern-AR.patt?rlkey=ti8kv2rla0qq26csqkcpnt43l&st=08ij4jdu">
-            <a-entity device-rotation-fix>
             <a-entity id="container" position="0 0 0" rotation="-90 0 0" tilt-shine>
                 <a-entity id="imageFrame" position="0 0.7 0">
                     <a-entity id="slideContainer" position="0 0 0.001">
@@ -144,95 +143,12 @@
                             data-url="https://shachikunin.github.io/"></a-plane>
                 </a-entity>
             </a-entity>
-            </a-entity>
         </a-marker>
 
         <a-entity camera></a-entity>
     </a-scene>
 
     <script>
-        AFRAME.registerComponent('device-rotation-fix', {
-          init: function() {
-            // デバイスとブラウザの検出
-            const userAgent = navigator.userAgent.toLowerCase();
-            const isIOS = /iphone|ipad|ipod/.test(userAgent);
-            const isAndroid = /android/.test(userAgent);
-            const isChrome = /chrome|crios/.test(userAgent);
-            const isSafari = /safari/.test(userAgent) && !isChrome;
-            
-            const container = this.el.querySelector('#container');
-            if (!container) return;
-
-            // デフォルトの回転値
-            let rotationX = -90;
-            let rotationY = 0;
-            let rotationZ = 0;
-
-            // デバイス/ブラウザ特有の補正
-            if (isIOS && isSafari) {
-              // iOS Safariの場合
-              rotationX = 0;
-            } else if (isAndroid) {
-              if (isChrome) {
-                // Android Chromeの場合
-                rotationX = -90;
-              } else {
-                // Android その他ブラウザの場合
-                rotationX = -90;
-                // 必要に応じて追加の補正
-              }
-            }
-
-            // 回転値の適用
-            container.setAttribute('rotation', `${rotationX} ${rotationY} ${rotationZ}`);
-
-            // デバイスの向きが変更された時の処理
-            window.addEventListener('deviceorientationabsolute', (event) => {
-              this.handleOrientation(event, {isIOS, isAndroid, isChrome, isSafari});
-            }, true);
-
-            // バックアップとして通常のdeviceorientationイベントもリッスン
-            window.addEventListener('deviceorientation', (event) => {
-              this.handleOrientation(event, {isIOS, isAndroid, isChrome, isSafari});
-            }, true);
-          },
-
-          handleOrientation: function(event, deviceInfo) {
-            const container = this.el.querySelector('#container');
-            if (!container) return;
-
-            const {isIOS, isAndroid, isChrome, isSafari} = deviceInfo;
-            
-            // 現在の回転値を取得
-            const currentRotation = container.getAttribute('rotation');
-            
-            // デバイス特有の補正値を計算
-            let compensationX = 0;
-            let compensationY = 0;
-            let compensationZ = 0;
-
-            if (event.beta !== null && event.gamma !== null) {
-              if (isIOS && isSafari) {
-                // iOS Safariの補正
-                compensationX = event.beta * 0.1;
-                compensationY = event.gamma * 0.1;
-              } else if (isAndroid) {
-                // Androidの補正
-                compensationX = -90 + (event.beta * 0.1);
-                compensationY = event.gamma * 0.1;
-              }
-
-              // 補正値の適用（急激な変化を防ぐためスムージング）
-              const smoothFactor = 0.1;
-              currentRotation.x += (compensationX - currentRotation.x) * smoothFactor;
-              currentRotation.y += (compensationY - currentRotation.y) * smoothFactor;
-              currentRotation.z += (compensationZ - currentRotation.z) * smoothFactor;
-
-              container.setAttribute('rotation', currentRotation);
-            }
-          }
-        });
-
         AFRAME.registerComponent('tilt-shine', {
             schema: {
                 animationDuration: { default: 1000 }
