@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Larger Image with Wooden Clip on Wider Grid Background</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            width: 95vw;
+            height: 95vh;
+            position: relative;
+            overflow: visible;
+        }
+        .grid {
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0,0,0,0.3) 2px, transparent 2px),
+                linear-gradient(90deg, rgba(0,0,0,0.3) 2px, transparent 2px);
+            background-size: 60px 60px;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        .grid-shadow {
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0,0,0,0.2) 2px, transparent 2px),
+                linear-gradient(90deg, rgba(0,0,0,0.2) 2px, transparent 2px);
+            background-size: 60px 60px;
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: -1;
+            filter: blur(3px);
+        }
+        .image-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .image {
+            width: 425px;
+            height: 600px;
+            background-color: #fff;
+            transform: rotate(-5deg);
+            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+            position: relative;
+        }
+        .clip {
+            width: 120px;
+            height: 50px;
+            background-color: #d7a672;
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 5px 5px 0 0;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .clip::before, .clip::after {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 100%;
+            background-color: #b38b5d;
+            top: 0;
+        }
+        .clip::before {
+            left: 12px;
+        }
+        .clip::after {
+            right: 12px;
+        }
+        .clip-shadow {
+            width: 110px;
+            height: 6px;
+            background-color: rgba(0,0,0,0.1);
+            position: absolute;
+            top: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 50%;
+            filter: blur(2px);
+        }
+        .image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="grid"></div>
+        <div class="grid-shadow"></div>
+        <div class="image-container">
+            <div class="image">
+                <div class="clip"></div>
+                <div class="clip-shadow"></div>
+                <img src="https://dl.dropboxusercontent.com/scl/fi/lzaho2pddwdins8ogkvsl/.png?rlkey=vv341t8z2yhml0tdjysuznop0&st=fvhol1ay" alt="中央の画像">
+            </div>
+        </div>
+    </div>
+</body>
+</html>

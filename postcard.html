@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ポストカード</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Monsieur+La+Doulaise&family=Mrs+Saint+Delafield&family=Noto+Color+Emoji&display=swap');
+        
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+            font-family: 'Caveat', cursive;
+        }
+        .postcard-container {
+            position: relative;
+            width: 510px; /* 340px * 1.5 */
+            height: 720px; /* 480px * 1.5 */
+        }
+        .postcard {
+            position: absolute;
+            width: 480px; /* 320px * 1.5 */
+            height: 690px; /* 460px * 1.5 */
+            background-color: white;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.19), 0 9px 9px rgba(0,0,0,0.23);
+            padding: 22.5px; /* 15px * 1.5 */
+            box-sizing: border-box;
+        }
+        .postcard::before {
+            content: '';
+            position: absolute;
+            top: 22.5px; /* 15px * 1.5 */
+            left: 22.5px; /* 15px * 1.5 */
+            right: 22.5px; /* 15px * 1.5 */
+            bottom: 105px; /* 70px * 1.5 */
+            border: 1px solid #e0e0e0;
+        }
+        .postcard img {
+            width: calc(100% - 45px); /* (100% - 30px) * 1.5 */
+            height: calc(100% - 127.5px); /* (100% - 85px) * 1.5 */
+            object-fit: cover;
+            position: absolute;
+            top: 22.5px; /* 15px * 1.5 */
+            left: 22.5px; /* 15px * 1.5 */
+        }
+        .signature {
+            position: absolute;
+            bottom: 37.5px; /* 25px * 1.5 */
+            right: 45px; /* 30px * 1.5 */
+            font-family: "Mrs Saint Delafield", cursive;
+            font-size: 90px; /* 60px * 1.5 */
+            color: #000;
+            transform: rotate(-15deg);
+            text-shadow: 1.5px 1.5px 3px rgba(0,0,0,0.3);
+        }
+        .shadow {
+            position: absolute;
+            top: 15px; /* 10px * 1.5 */
+            left: 15px; /* 10px * 1.5 */
+            width: 480px; /* 320px * 1.5 */
+            height: 690px; /* 460px * 1.5 */
+            background-color: rgba(0,0,0,0.2);
+            filter: blur(15px); /* 10px * 1.5 */
+            z-index: -1;
+        }
+    </style>
+</head>
+<body>
+    <div class="postcard-container">
+        <div class="shadow"></div>
+        <div class="postcard">
+            <img src=https://dl.dropboxusercontent.com/scl/fi/lzaho2pddwdins8ogkvsl/.png?rlkey=vv341t8z2yhml0tdjysuznop0&st=fvhol1ay alt="ポストカード">
+            <div class="signature">Houshou Marine</div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ホログラムカード</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Puritan:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #1a1a2e;
+            perspective: 1000px;
+            font-family: 'Puritan', sans-serif;
+        }
+        .card-container {
+            width: 500px;
+            height: 700px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.1s;
+        }
+        .card {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            border: 10px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            box-sizing: border-box;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        .card img {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            object-fit: cover;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        .holographic {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(255,0,0,0.2), rgba(0,255,0,0.2), rgba(0,0,255,0.2));
+            opacity: 0.7;
+            mix-blend-mode: color-dodge;
+            pointer-events: none;
+            border-radius: 10px;
+        }
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            border-radius: 10px;
+            overflow: hidden;
+            mix-blend-mode: screen;
+        }
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            border-radius: 50%;
+            transition: transform 0.1s ease;
+        }
+        .card-name-container {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            background-color: rgba(0, 0, 0, 0.3);
+            padding: 10px 0;
+            z-index: 10;
+            border-radius: 10px;
+        }
+        .card-name {
+            font-size: 32px;
+            font-weight: 700;
+            text-align: left;
+            color: transparent;
+            padding: 0 10px;
+            -webkit-text-stroke: 1px white;
+            text-stroke: 1px white;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+    <div class="card-container">
+        <div class="card">
+            <img src="https://dl.dropboxusercontent.com/scl/fi/lzaho2pddwdins8ogkvsl/.png?rlkey=vv341t8z2yhml0tdjysuznop0&st=fvhol1ay" alt="Specified Card Image">
+            <div class="holographic"></div>
+            <div class="particles"></div>
+            <div class="card-name-container">
+                <div class="card-name">Houshou Marine</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const cardContainer = document.querySelector('.card-container');
+        const card = document.querySelector('.card');
+        const img = card.querySelector('img');
+        const holographic = document.querySelector('.holographic');
+        const particles = document.querySelector('.particles');
+
+        // Create particles
+        for (let i = 0; i < 500; i++) {
+            const particle = document.createElement('div');
+            particle.classList.add('particle');
+            particle.style.left = `${Math.random() * 100}%`;
+            particle.style.top = `${Math.random() * 100}%`;
+            particles.appendChild(particle);
+        }
+
+        function updateParticleColors() {
+            const particleElements = document.querySelectorAll('.particle');
+            particleElements.forEach((particle) => {
+                const x = parseFloat(particle.style.left) / 100;
+                const y = parseFloat(particle.style.top) / 100;
+                const r = Math.floor(255 * x);
+                const g = Math.floor(255 * y);
+                const b = Math.floor(255 * (1 - x * y));
+                particle.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+            });
+        }
+
+        updateParticleColors();
+
+        document.addEventListener('mousemove', (e) => {
+            const { clientX, clientY } = e;
+            const { innerWidth, innerHeight } = window;
+            
+            const x = (clientX - innerWidth / 2) / (innerWidth / 2);
+            const y = (clientY - innerHeight / 2) / (innerHeight / 2);
+            
+            const tiltX = y * 15;
+            const tiltY = -x * 15;
+            
+            card.style.transform = `rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
+            
+            const hueRotate = (x + y) * 180;
+            holographic.style.filter = `hue-rotate(${hueRotate}deg)`;
+
+            // Move particles
+            const particleElements = document.querySelectorAll('.particle');
+            particleElements.forEach((particle) => {
+                const speed = 0.5;
+                particle.style.transform = `translate(${-x * speed}px, ${-y * speed}px)`;
+            });
+        });
+
+        // Smooth image loading
+        img.onload = () => {
+            img.style.opacity = '1';
+        };
+        img.style.opacity = '0';
+        img.style.transition = 'opacity 0.3s ease';
+    </script>
+</body>
+</html>
