@@ -7,6 +7,10 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
   <link rel="icon" type="image/png" href="image/shachikunin_icon.png">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans|Roboto|Lato|Noto+Serif+JP|Marcellus" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
+  <script src="https://unpkg.com/imagesloaded@5/imagesloaded.pkgd.min.js"></script>
+
   <title>必殺社畜人のホームページ</title>
   <style>
     body {
@@ -94,11 +98,145 @@
       margin-bottom: 20px;
     }
     .social-buttons .btn {
+      position: relative;
       margin: 0 10px;
-      transition: filter 0.3s;
+      transition: all 0.3s ease;
+      z-index: 1;
+      border: none;
+      padding: 8px 16px;
     }
+
+    /* Twitter Button */
+    .social-buttons .btn-twitter {
+      background-color: #1DA1F2;
+      border-color: #1DA1F2;
+      color: #fff;
+    }
+
+    /* YouTube Button */
+    .social-buttons .btn-youtube {
+      background-color: #FF0000;
+      border-color: #FF0000;
+      color: #fff;
+    }
+
+    /* Pixiv Button */
+    .social-buttons .btn-pixiv {
+      background-color: #0096FA;
+      border-color: #0096FA;
+      color: #fff;
+    }
+
+    /* GitHub Button */
+    .social-buttons .btn-github {
+      background-color: #333;
+      border-color: #333;
+      color: #fff;
+    }
+
+    /* SoundCloud Button */
+    .social-buttons .btn-soundcloud {
+      background-color: #FF5500;
+      border-color: #FF5500;
+      color: #fff;
+    }
+
+    /* Ripple effect */
+    .social-buttons .btn::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 100%;
+      height: 100%;
+      border-radius: 4px;
+      transform: translate(-50%, -50%);
+      z-index: -1;
+    }
+
+    /* Button specific ripple colors */
+    .social-buttons .btn-twitter::after {
+      border: 2px solid #1DA1F2;
+    }
+
+    .social-buttons .btn-youtube::after {
+      border: 2px solid #FF0000;
+    }
+
+    .social-buttons .btn-pixiv::after {
+      border: 2px solid #0096FA;
+    }
+
+    .social-buttons .btn-github::after {
+      border: 2px solid #333;
+    }
+
+    .social-buttons .btn-soundcloud::after {
+      border: 2px solid #FF5500;
+    }
+
+    /* Hover effects */
     .social-buttons .btn:hover {
-      filter: brightness(1.2);
+      background-color: #fff !important;
+    }
+
+    /* Hover text colors - text becomes brand color */
+    .social-buttons .btn-twitter:hover {
+      color: #1DA1F2;
+      border-color: #1DA1F2;
+    }
+
+    .social-buttons .btn-youtube:hover {
+      color: #FF0000;
+      border-color: #FF0000;
+    }
+
+    .social-buttons .btn-pixiv:hover {
+      color: #0096FA;
+      border-color: #0096FA;
+    }
+
+    .social-buttons .btn-github:hover {
+      color: #333;
+      border-color: #333;
+    }
+
+    .social-buttons .btn-soundcloud:hover {
+      color: #FF5500;
+      border-color: #FF5500;
+    }
+
+    /* Ripple animation on hover */
+    .social-buttons .btn:hover::after {
+      animation: ripple 0.6s ease-out;
+    }
+
+    @keyframes ripple {
+      0% {
+        width: 100%;
+        height: 100%;
+        opacity: 1;
+      }
+      100% {
+        width: 150%;
+        height: 150%;
+        opacity: 0;
+      }
+    }
+
+    /* Hover elevation effect */
+    .social-buttons .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    /* Icon animation */
+    .social-buttons .fab {
+      transition: transform 0.3s ease;
+    }
+
+    .social-buttons .btn:hover .fab {
+      transform: scale(1.1);
     }
 
     #theme-toggle {
@@ -583,10 +721,6 @@
         box-shadow: none;
       }
     }
-
-    .image-gallery {
-      margin-top: 30px;
-    }
     
     .gallery-image {
       margin-bottom: 30px;
@@ -826,6 +960,22 @@
       font-size: 16px;
       text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
     }
+    
+    .gallery-grid {
+      width: 100%;
+    }
+
+    .gallery-grid-item {
+      width: calc(33.333% - 20px);
+      margin: 10px;
+      display: block;
+    }
+
+    .gallery-grid-item img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
 
     #loading {
       position: fixed;
@@ -875,6 +1025,8 @@
       font-size: 80px;
       opacity: 0;
       animation: fadeInOut 2s ease-in-out forwards;
+      white-space: nowrap; /* 追加: テキストを改行させない */
+      overflow: visible; /* 追加: はみ出た部分を表示 */
     }
     
     @keyframes fadeInOut {
@@ -893,6 +1045,148 @@
       }
     }
     
+    /* モバイルナビゲーションの調整 */
+    @media (max-width: 768px) {
+      .navbar-nav {
+        text-align: center;
+        background: rgba(0, 0, 0, 0.8);
+        padding: 10px 0;
+      }
+
+      .nav-item {
+        margin: 5px 0;
+      }
+
+      /* セクションタイトルの調整 */
+      .section-title h1 {
+        font-size: 32px;
+        padding: 30px 0;
+      }
+
+      /* イメージビューアーの調整 */
+      .image-viewer {
+        width: 100%;
+        height: auto;
+        max-width: 100%;
+        padding: 0 10px;
+      }
+
+      .arrow {
+        font-size: 24px;
+        margin: 0 5px;
+      }
+
+      /* アプリケーションサムネイルの調整 */
+      .app-thumbnail img {
+        width: 100%;
+        height: auto;
+      }
+
+      /* YouTubeサムネイルの調整 */
+      .youtube-thumbnail {
+        width: 100%;
+        margin: 10px 0;
+      }
+      
+      .youtube-thumbnail img {
+        width: 100%;
+        height: auto;
+      }
+
+      /* プロフィールセクションの調整 */
+      .profile-image-wrapper {
+        width: 80%;
+        padding-top: 80%;
+        margin: 0 auto 20px;
+      }
+
+      /* ギャラリー画像の調整 */
+      .gallery-item {
+        margin-bottom: 20px;
+      }
+
+      .gallery-image {
+        width: 100%;
+        height: auto;
+      }
+
+      /* モーダルウィンドウの調整 */
+      .modal-dialog {
+        margin: 10px;
+        width: 95%;
+      }
+
+      /* フッターのソーシャルボタン調整 */
+      .social-buttons .btn {
+        margin: 5px;
+        font-size: 14px;
+      }
+
+      /* QRコードボタンとリンクの配置 */
+      .qrcodebutton, .qrcodelink {
+        display: block;
+        margin: 10px 0;
+        width: 100%;
+        text-align: center;
+      }
+
+      /* SoundCloudの埋め込み */
+      iframe[src*="soundcloud.com"] {
+        width: 100% !important;
+      }
+      
+      .gallery-grid-item {
+        width: calc(100% - 20px);
+      }
+    }
+
+    /* タブレット向けの調整 */
+    @media (min-width: 769px) and (max-width: 1024px) {
+      .section-title h1 {
+        font-size: 36px;
+      }
+
+      .app-thumbnail img {
+        width: 100%;
+        height: auto;
+      }
+
+      .image-viewer {
+        width: 90%;
+        height: auto;
+      }
+      
+      .gallery-grid-item {
+        width: calc(50% - 20px);
+      }
+    }
+
+    /* 共通のレスポンシブ調整 */
+    .container {
+      width: 100%;
+      padding-right: 15px;
+      padding-left: 15px;
+      margin-right: auto;
+      margin-left: auto;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    /* ギャラリーモーダルの調整 */
+    .gallery-modal-image {
+      max-width: 100%;
+      height: auto;
+    }
+
+    /* スター背景の調整 */
+    .stars {
+      position: fixed;
+      width: 100vw;
+      height: 100vh;
+    }
 
   </style>
 </head>
@@ -965,11 +1259,11 @@
     </div>
     <div class="container">
       <p>これまで制作したデジタルイラストの一部を掲載しています。</p>
-      <div class="row image-gallery">
+      <div class="gallery-grid">
         <!-- Dropboxの埋め込みコードをここに追加。-->
         <!-- 「www.dropbox.com」を「dl.dropboxusercontent.com」に変更 -->
         <!-- 「?dl=0」を削除-->
-        <div class="col-md-4">
+        <div class="gallery-grid-item">
           <div class="gallery-item">
             <img src="https://dl.dropboxusercontent.com/scl/fi/fx37075ffttc3gapqunq5/illust_1.png?rlkey=459g5lh3xwv8nuau98axcmrd7" alt="Gaur Gura" class="img-fluid gallery-image" data-description="Hololive EN Member/Vtuber">
             <div class="overlay">
@@ -977,7 +1271,7 @@
             </div>
           </div>
         </div>
-        <div class="col-md-4">
+        <div class="gallery-grid-item">
           <div class="gallery-item">
             <img src="https://dl.dropboxusercontent.com/scl/fi/tt171nwwy6ajo5lqdvbgw/illust_2.png?rlkey=rnystkc99r4nbv3y5ujlypd4e" alt="Choco Kuki" class="img-fluid gallery-image" data-description="Original Character">
             <div class="overlay">
@@ -986,7 +1280,7 @@
           </div>
           
         </div>
-        <div class="col-md-4">
+        <div class="gallery-grid-item">
           <div class="gallery-item">
             <img src="https://dl.dropboxusercontent.com/scl/fi/ob6zs14p7j7513razi80k/illust_3.png?rlkey=lewmpw6r275pd2aq8gxd7j68p" alt="Ui Shigure" class="img-fluid gallery-image" data-description="Illustrator/Vtuber">
             <div class="overlay">
@@ -995,7 +1289,7 @@
           </div>
         </div>
 
-        <div class="col-md-4">
+        <div class="gallery-grid-item">
           <div class="gallery-item">
             <img src="https://dl.dropboxusercontent.com/scl/fi/tfuxv5tok7qehheog80u4/illust_4.png?rlkey=dwup43whl6ntotie0yp2ogbq0" alt="Choco Kuki" class="img-fluid gallery-image" data-description="Original Character">
             <div class="overlay">
@@ -1003,7 +1297,7 @@
             </div>
           </div>
         </div>
-        <div class="col-md-4">
+        <div class="gallery-grid-item">
           <div class="gallery-item">
             <img src="https://dl.dropboxusercontent.com/scl/fi/yid6kkx3rw2ehm648cnkd/illust_5.png?rlkey=uwollvz2l6fehcnd49rhr51mp" alt="Suisei Hoshimachi" class="img-fluid gallery-image" data-description="Hololive JP Member/Vtuber">
             <div class="overlay">
@@ -1011,9 +1305,41 @@
             </div>
           </div>
         </div>
-        <div class="col-md-4">
+        <div class="gallery-grid-item">
           <div class="gallery-item">
             <img src="https://dl.dropboxusercontent.com/scl/fi/7md574q73a7nsvr0v69le/illust_6.png?rlkey=7j4con7o82jjn0sky6hxr5782" alt="Pekora Usada" class="img-fluid gallery-image" data-description="Hololive JP Member/Vtuber">
+            <div class="overlay">
+              <div class="overlay-text">拡大表示する</div>
+            </div>
+          </div>
+        </div>
+        <div class="gallery-grid-item">
+          <div class="gallery-item">
+            <img src="https://dl.dropboxusercontent.com/scl/fi/b2tlbezkwb7k49saaki3e/illust_8.png?rlkey=21kq8m6sb0r7wd5tcef6ihhyr&st=acfjc4ap" alt="Pekora Usada" class="img-fluid gallery-image" data-description="Hololive JP Member/Vtuber">
+            <div class="overlay">
+              <div class="overlay-text">拡大表示する</div>
+            </div>
+          </div>
+        </div>
+        <div class="gallery-grid-item">
+          <div class="gallery-item">
+            <img src="https://dl.dropboxusercontent.com/scl/fi/mi9wprr5ngwjrj01ulp4a/illust_9.png?rlkey=gvfbmi1iq6umh72t4tdexwgfl&st=tehnrvrx" alt="Shiranui Flare" class="img-fluid gallery-image" data-description="Hololive JP Member/Vtuber">
+            <div class="overlay">
+              <div class="overlay-text">拡大表示する</div>
+            </div>
+          </div>
+        </div>
+        <div class="gallery-grid-item">
+          <div class="gallery-item">
+            <img src="https://dl.dropboxusercontent.com/scl/fi/v4u997tawq20x3shkeoz2/illust_10.png?rlkey=bdixxkwt8ohc0jmimfiq6awxw&st=8j57hzeu" alt="Shirogane Noel" class="img-fluid gallery-image" data-description="Hololive JP Member/Vtuber">
+            <div class="overlay">
+              <div class="overlay-text">拡大表示する</div>
+            </div>
+          </div>
+        </div>
+        <div class="gallery-grid-item">
+          <div class="gallery-item">
+            <img src="https://dl.dropboxusercontent.com/scl/fi/lzaho2pddwdins8ogkvsl/illust_11.png?rlkey=vv341t8z2yhml0tdjysuznop0&st=agtegwp0" alt="Hoshou Marine" class="img-fluid gallery-image" data-description="Hololive JP Member/Vtuber">
             <div class="overlay">
               <div class="overlay-text">拡大表示する</div>
             </div>
@@ -1073,6 +1399,19 @@
         <div class="mt-3">
           <button id="generate-qrcode-superdtm-album-no1" class="btn btn-primary mr-2 qrcodebutton" data-url="https://superdtmclub.booth.pm/items/4478575">QRコード生成</button>
           <a href="https://superdtmclub.booth.pm/items/4478575" target="_blank"class="qrcodelink">Boothに移動する</a>
+        </div>
+        
+        <p>image sketch Studioという作曲サークルで発表した作品です。</p>
+        <p>「恋に魔法はないけれど feat .POPY - 必殺社畜人 + youthUK」 Youtubeでは28:55~</p>
+        <div class="youtube-thumbnail">
+          <img src="https://img.youtube.com/vi/pGSDvKGIe5M/mqdefault.jpg" alt="YouTube Thumbnail" class="img-thumbnail" data-toggle="modal" data-target="#youtube-modal" data-video-url="https://www.youtube.com/embed/pGSDvKGIe5M?start=1735">
+          <div class="play-button" data-toggle="modal" data-target="#youtube-modal" data-video-url="https://www.youtube.com/embed/pGSDvKGIe5M?start=1735">
+            <i class="fas fa-play-circle"></i>
+          </div>
+        </div>
+        <div class="mt-3">
+          <button id="generate-qrcode-gomibako-sketch" class="btn btn-primary mr-2 qrcodebutton" data-url="https://imagesketchstd.booth.pm/items/6157231">QRコード生成</button>
+          <a href="https://imagesketchstd.booth.pm/items/6157231" target="_blank"class="qrcodelink">Boothに移動する</a>
         </div>
     </div>
   </section>
@@ -1307,6 +1646,76 @@
     </div>
     <p>どこで使うかわからないけど、動画を画像と同じように3Dとして傾けられるプログラム。何かに応用したい。</p>
     
+    <div class="content-title">
+      <h3>ARを使ったイラストギャラリー</h3>
+    </div>
+    <div class="app-thumbnail">
+      <a href="ARImageGallery.html">
+      クリックでアプリを試す
+      </a>
+    </div>
+    <p>（画像準備中）ARマーカー検出するとイラストを表示して、ギャラリー形式で見ることができます。AR名刺などに活用できないか模作中。</p>
+        
+    <div class="content-title">
+      <h3>キューブ時計</h3>
+    </div>
+    <div class="app-thumbnail">
+      <a href="cubeClock.html">
+      クリックでアプリを試す
+      </a>
+    </div>
+    <p>（画像準備中）キューブ上の時計で、4パターンに表示を切り替えることができます。</p>
+        
+    <div class="content-title">
+      <h3>花火</h3>
+    </div>
+    <div class="app-thumbnail">
+      <a href="firework.html">
+      クリックでアプリを試す
+      </a>
+    </div>
+    <p>（画像準備中）画面をクリックすると、その位置で花火が上がります。夏はこれで乗り切ろう。</p>
+        
+    <div class="content-title">
+      <h3>電光掲示板</h3>
+    </div>
+    <div class="app-thumbnail">
+      <a href="ledDisplay.html">
+      クリックでアプリを試す
+      </a>
+    </div>
+    <p>（画像準備中）電光掲示板みたいなやつ。</p>
+    
+    <div class="content-title">
+      <h3>ホログラムカード</h3>
+    </div>
+    <div class="app-thumbnail">
+      <a href="ledDisplay.html">
+      クリックでアプリを試す
+      </a>
+    </div>
+    <p>（画像準備中）カーソルの位置によって光の変化を楽しめるカード。</p>
+    
+    <div class="content-title">
+      <h3>サイン入りポストカード</h3>
+    </div>
+    <div class="app-thumbnail">
+      <a href="ledDisplay.html">
+      クリックでアプリを試す
+      </a>
+    </div>
+    <p>（画像準備中）サイン入りポストカードを再現しました。</p>
+    
+    <div class="content-title">
+      <h3>フェンスに飾られたポストカード</h3>
+    </div>
+    <div class="app-thumbnail">
+      <a href="ledDisplay.html">
+      クリックでアプリを試す
+      </a>
+    </div>
+    <p>（画像準備中）フェンスにクリップを挟んで飾るタイプのポストカードを再現しました。</p>
+    
   </div>
   </section>
   
@@ -1354,7 +1763,7 @@
         博衣こよりさんの絶叫を集めて、声で神経衰弱ができるゲームを作りました。<br>
         基本的にずっと絶叫を聴くことになるので、耳にダメージが入らないように休みながらプレイすることを推奨します。
       </p>
-      <p><font size="6" color="#ff8800"><b>[2024/04/02] 声ネタの主である博衣こよりさんにゲームを配信していただきました！<br>↓アーカイブはこちら↓</b></font></p>
+      <p id="koyori-announcement"><font size="6" color="#ff8800"><b>[2024/04/02] 声ネタの主である博衣こよりさんにゲームを配信していただきました！<br>↓アーカイブはこちら↓</b></font></p>
       <div class="youtube-thumbnail">
         <img src="https://img.youtube.com/vi/lU76Me5mtjA/mqdefault.jpg" alt="YouTube Thumbnail" class="img-thumbnail" data-toggle="modal" data-target="#youtube-modal" data-video-url="https://www.youtube.com/embed/lU76Me5mtjA">
         <div class="play-button" data-toggle="modal" data-target="#youtube-modal" data-video-url="https://www.youtube.com/embed/lU76Me5mtjA">
@@ -1472,11 +1881,21 @@
   <footer>
     <div class="container" style="padding: 0;">
       <div class="social-buttons">
-        <a href="https://twitter.com/Jblx_xldLo0" target="_blank" class="btn btn-primary"><i class="fab fa-twitter"></i> Twitter</a>
-        <a href="https://www.youtube.com/channel/UC_Yp5JypFJMJwsKDf_jzoaw" target="_blank" class="btn btn-danger"><i class="fab fa-youtube"></i> YouTube</a>
-        <a href="https://www.pixiv.net/users/43712965" target="_blank" class="btn btn-info"><i class="fab fa-pixiv"></i> Pixiv</a>
-        <a href="https://github.com/shachikunin" target="_blank" class="btn btn-dark"><i class="fab fa-github"></i> GitHub</a>
-        <a href="https://soundcloud.com/swugj2gjxfum" target="_blank" class="btn btn-warning"><i class="fab fa-soundcloud"></i> SoundCloud</a>
+        <a href="https://twitter.com/Jblx_xldLo0" target="_blank" class="btn btn-twitter">
+          <i class="fab fa-twitter"></i> Twitter
+        </a>
+        <a href="https://www.youtube.com/channel/UC_Yp5JypFJMJwsKDf_jzoaw" target="_blank" class="btn btn-youtube">
+          <i class="fab fa-youtube"></i> YouTube
+        </a>
+        <a href="https://www.pixiv.net/users/43712965" target="_blank" class="btn btn-pixiv">
+          <i class="fab fa-pixiv"></i> Pixiv
+        </a>
+        <a href="https://github.com/shachikunin" target="_blank" class="btn btn-github">
+          <i class="fab fa-github"></i> GitHub
+        </a>
+        <a href="https://soundcloud.com/swugj2gjxfum" target="_blank" class="btn btn-soundcloud">
+          <i class="fab fa-soundcloud"></i> SoundCloud
+        </a>
       </div>
       <p class="text-center">&copy; 2024 All Rights Reserved.</p>
     </div>
@@ -1539,6 +1958,17 @@
       }); 
 
       $('#generate-qrcode-superdtm-album-no1').on('click', function() {
+        var url = $(this).data('url');
+        $('#qrcode').empty();
+        new QRCode('qrcode', {
+          text: url,
+          width: 200,
+          height: 200
+        });
+        $('#qrcode-modal').modal('show');
+      });
+      
+      $('#generate-qrcode-gomibako-sketch').on('click', function() {
         var url = $(this).data('url');
         $('#qrcode').empty();
         new QRCode('qrcode', {
@@ -1720,40 +2150,93 @@
             }
           });
         }
+        
+        function fireConfetti() {
+          // 左側からのクラッカー
+          confetti({
+            particleCount: 100,
+            spread: 70,
+            origin: { x: 0, y: 0.5 },
+            angle: 60,
+            startVelocity: 60,
+            colors: ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff']
+          });
+
+          // 右側からのクラッカー
+          confetti({
+            particleCount: 100,
+            spread: 70,
+            origin: { x: 1, y: 0.5 },
+            angle: 120,
+            startVelocity: 60,
+            colors: ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff']
+          });
+        }
+        
+        let hasAnimationPlayed = false;
 
         window.addEventListener('scroll', function() {
-          scrollPosition = window.pageYOffset;
-          if (document.body.classList.contains('dark-mode')) {
-            $('.stars').css('opacity', 1 - 0.0002 * scrollPosition);
-          }
+            $(window).on('scroll', function() {
+                scrollPosition = window.pageYOffset;
+                if (document.body.classList.contains('dark-mode')) {
+                  $('.stars').css('opacity', 1 - 0.0002 * scrollPosition);
+                }
+                animateVisibleElements();
+                animateProfile();
+                animateGallery();
+
+                // クラッカーアニメーションの処理を追加
+                if (!hasAnimationPlayed) {
+                  const announcement = document.getElementById('koyori-announcement');
+                  if (announcement) {  // 要素の存在チェック
+                    const rect = announcement.getBoundingClientRect();
+                    const windowHeight = window.innerHeight;
+                    if (rect.top < windowHeight && rect.bottom >= 0) {
+                      fireConfetti();
+                      hasAnimationPlayed = true;
+                    }
+                  }
+                }
+            })
         });
         
         window.addEventListener("DOMContentLoaded", () => {
-          // 星を表示するための親要素を取得
-          const stars = document.querySelector(".stars");
-          // 星を生成する関数
-          const createStar = () => {
-            const starEl = document.createElement("span");
-            starEl.className = "star";
-            const minSize = 1; // 星の最小サイズを指定
-            const maxSize = 2; // 星の最大サイズを指定
-            const size = Math.random() * (maxSize - minSize) + minSize;
-            starEl.style.width = `${size}px`;
-            starEl.style.height = `${size}px`;
-            starEl.style.left = `${Math.random() * 100}%`;
-            starEl.style.top = `${Math.random() * 100}%`;
-            starEl.style.animationDelay = `${Math.random() * 10}s`;
-            stars.appendChild(starEl);
-          };
-          // for文で星を生成する関数を指定した回数呼び出す
-          for (let i = 0; i <= 500; i++) {
-            createStar();
-          }
+            $(document).ready(function() {
+                // 星を表示するための親要素を取得
+                const stars = document.querySelector(".stars");
+                // 星を生成する関数
+                const createStar = () => {
+                  const starEl = document.createElement("span");
+                  starEl.className = "star";
+                  const minSize = 1; // 星の最小サイズを指定
+                  const maxSize = 2; // 星の最大サイズを指定
+                  const size = Math.random() * (maxSize - minSize) + minSize;
+                  starEl.style.width = `${size}px`;
+                  starEl.style.height = `${size}px`;
+                  starEl.style.left = `${Math.random() * 100}%`;
+                  starEl.style.top = `${Math.random() * 100}%`;
+                  starEl.style.animationDelay = `${Math.random() * 10}s`;
+                  stars.appendChild(starEl);
+                };
+                // クラッカーアニメーションの処理を追加
+                if (!hasAnimationPlayed) {
+                  const announcement = document.getElementById('koyori-announcement');
+                  if (announcement) {  // 要素の存在チェック
+                    const rect = announcement.getBoundingClientRect();
+                    const windowHeight = window.innerHeight;
+                    if (rect.top < windowHeight && rect.bottom >= 0) {
+                      fireConfetti();
+                      hasAnimationPlayed = true;
+                    }
+                  }
+                }
+                // for文で星を生成する関数を指定した回数呼び出す
+                for (let i = 0; i <= 500; i++) {
+                  createStar();
+                }
+            })
         });
-
-        $(window).on('scroll', animateVisibleElements);
-        animateVisibleElements(); // ページ読み込み時にも実行する
-
+        
         function animateProfile() {
           var profileImage = $('.profile-image-wrapper');
           var profileText = $('.profile-text');
@@ -1768,8 +2251,6 @@
           }
         }
         
-        $(window).on('scroll', animateProfile);
-        animateProfile();
 
         function animateGallery() {
           var galleryImages = $('.gallery-image');
@@ -1783,8 +2264,39 @@
           });
         }
         
-        $(window).on('scroll', animateGallery);
-        animateGallery();
+        document.addEventListener('DOMContentLoaded', function() {
+          var grid = document.querySelector('.gallery-grid');
+          
+          // Masonryの初期化
+          var masonry = new Masonry(grid, {
+            itemSelector: '.gallery-grid-item',
+            columnWidth: '.gallery-grid-item',
+            percentPosition: true,
+            gutter: 10
+          });
+
+          // 画像が全て読み込まれた後にレイアウトを更新
+          imagesLoaded(grid).on('progress', function() {
+            masonry.layout();
+          });
+
+          // アニメーション用の関数を更新
+          function animateGallery() {
+            var galleryImages = document.querySelectorAll('.gallery-image');
+            galleryImages.forEach(function(img) {
+              var rect = img.getBoundingClientRect();
+              var windowHeight = window.innerHeight;
+              if (rect.top < windowHeight && rect.bottom >= 0) {
+                img.classList.add('animate');
+                masonry.layout(); // アニメーション後にレイアウトを更新
+              }
+            });
+          }
+
+          // スクロールイベントリスナーを追加
+          window.addEventListener('scroll', animateGallery);
+          animateGallery(); // 初期表示時にも実行
+        });
 
         $('.gallery-item').on('click', function() {
           var imageUrl = $(this).find('img').attr('src');
@@ -1855,4 +2367,4 @@
 
       </script> 
     </body> 
-    </html>
+</html>
