@@ -158,6 +158,10 @@
                 this.lastRotation = { x: -90, y: 0, z: 0 };
                 this.shineLayer = this.el.querySelector('#shineLayer');
                 this.baseRotation = -90;
+                this.initialMarkerRotation = null;
+                this.isInitialized = false;
+                this.lastTiltDirection = null; // 最後の傾き方向を保存
+                this.tiltThreshold = 5; // 傾きを検出する閾値（度）
                 this.textData = [
                     { 
                         title: "1 / 4", 
@@ -187,16 +191,24 @@
                 this.letterEntities = [];
                 this.setupImageTransition();
                 this.isTransitioning = false;
+                this.currentImageIndex = 0;
 
                 // ARマーカーの検出イベントリスナーを追加
                 const marker = document.querySelector('a-marker');
                 marker.addEventListener('markerFound', () => {
+                    this.initializeMarkerOrientation();
                     // マーカー検出時に初期テキストを表示
-                    this.createInitialText();
-                    this.updateNoteText(0);
-                    this.updateNoteWindow(0);
+                    this.createInitialText(this.currentImageIndex);
+                    this.updateNoteText(this.currentImageIndex);
+                    this.updateNoteWindow(this.currentImageIndex);
                     // フェードインアニメーション
                     this.fadeInNote();
+                });
+                
+                marker.addEventListener('markerLost', () => {
+                    // マーカーを見失った時の処理
+                    this.isInitialized = false;
+                    this.lastTiltDirection = null;
                 });
 
                 const overlay = document.getElementById('clickOverlay');
@@ -413,7 +425,6 @@
 
             setupImageTransition: function() {
                 this.imageIndices = [1, 2, 3, 4];//画像数変更時に変える
-                this.currentImageIndex = 0;
                 this.slideContainer = this.el.querySelector('#slideContainer');
                 this.leftImage = this.el.querySelector('#leftImage');
                 this.currentImage = this.el.querySelector('#currentImage');
@@ -632,11 +643,11 @@
                 requestAnimationFrame(animate);
             },
 
-            createInitialText: function() {
-                        this.createAnimatedText(this.textData[0].title);
-                        // フェードインアニメーションの追加
-                        this.fadeText(true);
-                    },
+            createInitialText: function(index = 0) {
+                this.createAnimatedText(this.textData[index].title);
+                // フェードインアニメーションの追加
+                this.fadeText(true);
+            },
 
                     createAnimatedText: function(text) {
                 const container = this.el.querySelector('#textContainer');
@@ -684,11 +695,55 @@
                     this.letterEntities.push(letterEntity);
                 });
             },
+            
+            initializeMarkerOrientation: function() {
+                const currentRotation = this.el.getAttribute('rotation');
+                this.initialMarkerRotation = { ...currentRotation };
+                this.isInitialized = true;
+            },
+
+            calculateTilt: function(currentRotation) {
+                if (!this.isInitialized || !this.initialMarkerRotation) return { tiltX: 0, tiltY: 0 };
+
+                // 現在の回転から初期回転を引いて相対回転を計算
+                let relativeX = currentRotation.x - this.initialMarkerRotation.x;
+                let relativeY = currentRotation.y - this.initialMarkerRotation.y;
+
+                // 上下の傾き（X軸回転）を基準とした左右の傾き（Y軸回転）の補正
+                let tiltX = (relativeX) / 45;
+                let tiltY = (relativeY) / 45;
+
+                // 傾きの方向を判定
+                const currentTiltDirection = this.determineTiltDirection(relativeY);
+
+                // 正面付近での左右の傾き方向の処理
+                if (Math.abs(relativeX) < this.tiltThreshold) { // ほぼ正面を向いている場合
+                    if (this.lastTiltDirection === null) {
+                        // 最初の傾き
+                        this.lastTiltDirection = currentTiltDirection;
+                    } else if (currentTiltDirection !== null && 
+                              currentTiltDirection !== this.lastTiltDirection) {
+                        // 傾きの方向が変わった場合、符号を反転
+                        tiltY = -tiltY;
+                    }
+                } else {
+                    // 上下に大きく傾いている場合は通常の計算を使用
+                    this.lastTiltDirection = currentTiltDirection;
+                }
+
+                return { tiltX, tiltY };
+            },
+
+            determineTiltDirection: function(relativeY) {
+                if (Math.abs(relativeY) < this.tiltThreshold) return null;
+                return relativeY > 0 ? 'right' : 'left';
+            },
 
             tick: function() {
+                if (!this.isInitialized) return;
+
                 const currentRotation = this.el.getAttribute('rotation');
-                const tiltX = (currentRotation.x - this.baseRotation) / 45;
-                const tiltY = currentRotation.y / 45;
+                const { tiltX, tiltY } = this.calculateTilt(currentRotation);
                 const totalTilt = Math.abs(tiltX) + Math.abs(tiltY);
 
                 if (this.shineLayer) {
