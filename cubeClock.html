@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Cube Clock</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #1a1a1a;
+            font-family: 'Roboto Mono', monospace;
+            overflow: hidden;
+        }
+        .scene {
+            width: 300px;
+            height: 300px;
+            perspective: 600px;
+        }
+        .cube {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transform: translateZ(-150px);
+            transition: transform 1s;
+        }
+        .cube__face {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 40px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            box-sizing: border-box;
+            backface-visibility: hidden;
+        }
+        .cube__face--front  { transform: rotateY(  0deg) translateZ(150px); }
+        .cube__face--right  { transform: rotateY( 90deg) translateZ(150px); }
+        .cube__face--back   { transform: rotateY(180deg) translateZ(150px); }
+        .cube__face--left   { transform: rotateY(-90deg) translateZ(150px); }
+
+        /* Word Clock Face */
+        #wordClock {
+            display: grid;
+            grid-template-columns: repeat(11, 1fr);
+            gap: 4px;
+            font-size: 14px;
+        }
+        .letter {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #4a4a4a;
+            font-weight: bold;
+        }
+        .active {
+            color: #f0f0f0;
+            text-shadow: 0 0 10px rgba(255,255,255,0.7);
+        }
+
+        /* Digital Clock Face */
+        #digitalClock {
+            font-size: 60px;
+            color: #f0f0f0;
+        }
+
+        /* Analog Clock Face */
+        #analogClock {
+            width: 200px;
+            height: 200px;
+            border: 2px solid #f0f0f0;
+            border-radius: 50%;
+            position: relative;
+        }
+        .hand {
+            position: absolute;
+            bottom: 50%;
+            left: 50%;
+            transform-origin: 50% 100%;
+            background-color: #f0f0f0;
+        }
+        #hourHand {
+            width: 6px;
+            height: 60px;
+            margin-left: -3px;
+        }
+        #minuteHand {
+            width: 4px;
+            height: 80px;
+            margin-left: -2px;
+        }
+        #secondHand {
+            width: 2px;
+            height: 90px;
+            margin-left: -1px;
+            background-color: #ff6b6b;
+        }
+
+        /* Big Numbers Face */
+        #bigNumbers {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            width: 100%;
+            height: 100%;
+            font-size: 100px;
+            color: #f0f0f0;
+        }
+        .number {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Navigation Buttons */
+        .nav-buttons {
+            position: absolute;
+            bottom: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        .nav-button {
+            padding: 10px 20px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #f0f0f0;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .nav-button:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="scene">
+        <div class="cube">
+            <div class="cube__face cube__face--front" id="wordClockFace">
+                <div id="wordClock"></div>
+            </div>
+            <div class="cube__face cube__face--right" id="digitalClockFace">
+                <div id="digitalClock"></div>
+            </div>
+            <div class="cube__face cube__face--back" id="analogClockFace">
+                <div id="analogClock">
+                    <div id="hourHand" class="hand"></div>
+                    <div id="minuteHand" class="hand"></div>
+                    <div id="secondHand" class="hand"></div>
+                </div>
+            </div>
+            <div class="cube__face cube__face--left" id="bigNumbersFace">
+                <div id="bigNumbers">
+                    <div class="number" id="hours1"></div>
+                    <div class="number" id="hours2"></div>
+                    <div class="number" id="minutes1"></div>
+                    <div class="number" id="minutes2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="nav-buttons">
+        <button class="nav-button" onclick="rotateCube('right')">←</button>
+        <button class="nav-button" onclick="rotateCube('left')">→</button>
+    </div>
+
+    <script>
+        const letters = [
+            'I','T','L','I','S','A','S','A','M','P','M',
+            'A','C','Q','U','A','R','T','E','R','D','C',
+            'T','W','E','N','T','Y','F','I','V','E','X',
+            'H','A','L','F','S','T','E','N','F','T','O',
+            'P','A','S','T','E','R','U','N','I','N','E',
+            'O','N','E','S','I','X','T','H','R','E','E',
+            'F','O','U','R','F','I','V','E','T','W','O',
+            'E','I','G','H','T','E','L','E','V','E','N',
+            'S','E','V','E','N','T','W','E','L','V','E',
+            'T','E','N','S','E','O','C','L','O','C','K'
+        ];
+
+        const wordClock = document.getElementById('wordClock');
+        letters.forEach(letter => {
+            const div = document.createElement('div');
+            div.className = 'letter';
+            div.textContent = letter;
+            wordClock.appendChild(div);
+        });
+
+        function updateWordClock(hour, minute) {
+            document.querySelectorAll('.letter').forEach(el => el.classList.remove('active'));
+
+            activateWord(0, 2);  // "IT"
+            activateWord(3, 2);  // "IS"
+            
+            // Activate AM or PM
+            if (hour < 12) {
+                activateWord(letters.join('').indexOf('AM'), 2);
+            } else {
+                activateWord(letters.join('').indexOf('PM'), 2);
+            }
+
+            const hourWords = ['TWELVE', 'ONE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX', 'SEVEN', 'EIGHT', 'NINE', 'TEN', 'ELEVEN'];
+            const currentHourIndex = hour % 12;
+            const nextHourIndex = (hour + 1) % 12;
+            
+            // Function to find the last occurrence of a word
+            function findLastOccurrence(word) {
+                return letters.join('').lastIndexOf(word);
+            }
+
+            if (minute >= 55) {
+                activateWord(letters.join('').indexOf('FIVE'), 4);
+                activateWord(letters.join('').indexOf('TO'), 2);
+                activateWord(letters.join('').lastIndexOf(hourWords[nextHourIndex]), hourWords[nextHourIndex].length);
+            } else if (minute >= 50) {
+                activateWord(letters.join('').indexOf('TEN'), 3);
+                activateWord(letters.join('').indexOf('TO'), 2);
+                activateWord(letters.join('').lastIndexOf(hourWords[nextHourIndex]), hourWords[nextHourIndex].length);
+            } else if (minute >= 45) {
+                activateWord(letters.join('').indexOf('QUARTER'), 7);
+                activateWord(letters.join('').indexOf('TO'), 2);
+                activateWord(letters.join('').lastIndexOf(hourWords[nextHourIndex]), hourWords[nextHourIndex].length);
+            } else if (minute >= 40) {
+                activateWord(letters.join('').indexOf('TWENTY'), 6);
+                activateWord(letters.join('').indexOf('TO'), 2);
+                activateWord(letters.join('').lastIndexOf(hourWords[nextHourIndex]), hourWords[nextHourIndex].length);
+            } else if (minute >= 35) {
+                activateWord(letters.join('').indexOf('TWENTY'), 6);
+                activateWord(letters.join('').indexOf('FIVE'), 4);
+                activateWord(letters.join('').indexOf('TO'), 2);
+                activateWord(letters.join('').lastIndexOf(hourWords[nextHourIndex]), hourWords[nextHourIndex].length);
+            } else if (minute >= 30) {
+                activateWord(letters.join('').indexOf('HALF'), 4);
+                activateWord(letters.join('').indexOf('PAST'), 4);
+                activateWord(letters.join('').lastIndexOf(hourWords[currentHourIndex]), hourWords[currentHourIndex].length);
+            } else if (minute >= 25) {
+                activateWord(letters.join('').indexOf('TWENTY'), 6);
+                activateWord(letters.join('').indexOf('FIVE'), 4);
+                activateWord(letters.join('').indexOf('PAST'), 4);
+                activateWord(letters.join('').lastIndexOf(hourWords[currentHourIndex]), hourWords[currentHourIndex].length);
+            } else if (minute >= 20) {
+                activateWord(letters.join('').indexOf('TWENTY'), 6);
+                activateWord(letters.join('').indexOf('PAST'), 4);
+                activateWord(letters.join('').lastIndexOf(hourWords[currentHourIndex]), hourWords[currentHourIndex].length);
+            } else if (minute >= 15) {
+                activateWord(letters.join('').indexOf('QUARTER'), 7);
+                activateWord(letters.join('').indexOf('PAST'), 4);
+                activateWord(letters.join('').lastIndexOf(hourWords[currentHourIndex]), hourWords[currentHourIndex].length);
+            } else if (minute >= 10) {
+                activateWord(letters.join('').indexOf('TEN'), 3);
+                activateWord(letters.join('').indexOf('PAST'), 4);
+                activateWord(letters.join('').lastIndexOf(hourWords[currentHourIndex]), hourWords[currentHourIndex].length);
+            } else if (minute >= 5) {
+                activateWord(letters.join('').indexOf('FIVE'), 4);
+                activateWord(letters.join('').indexOf('PAST'), 4);
+                activateWord(letters.join('').lastIndexOf(hourWords[currentHourIndex]), hourWords[currentHourIndex].length);
+            } else {
+                activateWord(letters.join('').lastIndexOf(hourWords[currentHourIndex]), hourWords[currentHourIndex].length);
+                activateWord(letters.join('').indexOf("OCLOCK"), 6);
+            }
+        }
+
+        function activateWord(start, length) {
+            const letters = document.querySelectorAll('.letter');
+            for (let i = start; i < start + length; i++) {
+                letters[i].classList.add('active');
+            }
+        }
+
+        function updateDigitalClock(hour, minute, second) {
+            const digitalClock = document.getElementById('digitalClock');
+            digitalClock.textContent = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}:${second.toString().padStart(2, '0')}`;
+        }
+
+        function updateAnalogClock(hour, minute, second) {
+            const hourHand = document.getElementById('hourHand');
+            const minuteHand = document.getElementById('minuteHand');
+            const secondHand = document.getElementById('secondHand');
+
+            const hourDegree = (hour % 12 + minute / 60) * 30;
+            const minuteDegree = (minute + second / 60) * 6;
+            const secondDegree = second * 6;
+
+            hourHand.style.transform = `rotate(${hourDegree}deg)`;
+            minuteHand.style.transform = `rotate(${minuteDegree}deg)`;
+            secondHand.style.transform = `rotate(${secondDegree}deg)`;
+        }
+
+        function updateBigNumbers(hour, minute) {
+            document.getElementById('hours1').textContent = hour.toString().padStart(2, '0')[0];
+            document.getElementById('hours2').textContent = hour.toString().padStart(2, '0')[1];
+            document.getElementById('minutes1').textContent = minute.toString().padStart(2, '0')[0];
+            document.getElementById('minutes2').textContent = minute.toString().padStart(2, '0')[1];
+        }
+
+        function updateAllClocks() {
+            const now = new Date();
+            const hour = now.getHours();
+            const minute = now.getMinutes();
+            const second = now.getSeconds();
+
+            updateWordClock(hour, minute);
+            updateDigitalClock(hour, minute, second);
+            updateAnalogClock(hour, minute, second);
+            updateBigNumbers(hour, minute);
+        }
+
+        updateAllClocks();
+        setInterval(updateAllClocks, 1000);
+
+        let currentRotation = 0;
+        const cube = document.querySelector('.cube');
+
+        function rotateCube(direction) {
+            currentRotation += direction === 'right' ? 90 : -90;
+            cube.style.transform = `translateZ(-150px) rotateY(${currentRotation}deg)`;
+        }
+
+        // Mouse drag functionality for PC
+        let isDragging = false;
+        let startX;
+
+        document.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            startX = e.clientX;
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            const currentX = e.clientX;
+            const diff = currentX - startX;
+            const sensitivity = 100; // Adjust this value to change drag sensitivity
+
+            if (Math.abs(diff) > sensitivity) {
+                rotateCube(diff > 0 ? 'right' : 'left');
+                startX = currentX;
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+
+        // Touch swipe functionality for mobile
+        document.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+        });
+
+        document.addEventListener('touchmove', (e) => {
+            if (!startX) return;
+
+            const currentX = e.touches[0].clientX;
+            const diff = currentX - startX;
+            const sensitivity = 50; // Adjust this value to change swipe sensitivity
+
+            if (Math.abs(diff) > sensitivity) {
+                rotateCube(diff > 0 ? 'right' : 'left');
+                startX = null;
+            }
+        });
+
+        document.addEventListener('touchend', () => {
+            startX = null;
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') {
+                rotateCube('left');
+            } else if (e.key === 'ArrowRight') {
+                rotateCube('right');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>電光掲示板</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@700&family=Roboto+Mono:wght@700&display=swap');
+        body {
+            background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+        .marquee-container {
+            position: relative;
+            width: 60%;
+            height: 100px;
+            overflow: hidden;
+            border: 2px solid #ff8;
+            border-radius: 5px;
+            background-color: #111;
+        }
+        .marquee {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            white-space: nowrap;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+        }
+        .marquee-content {
+            display: flex;
+            align-items: center;
+        }
+        .marquee-text {
+            display: inline-block;
+            font-size: 48px;
+            font-family: 'Roboto Mono', 'Noto Sans JP', monospace;
+            color: #ff8;
+            text-shadow: 0 0 5px #ff8, 0 0 10px #ff8;
+            margin: 0;
+            padding: 0 50px;
+            letter-spacing: 1px;
+            line-height: 1;
+        }
+        .dot-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: radial-gradient(circle, #222 1px, transparent 1px);
+            background-size: 3px 3px;
+            mix-blend-mode: multiply;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="marquee-container">
+        <div class="marquee">
+            <div class="marquee-content">
+                <p class="marquee-text">ようこそ必殺社畜人のページへ！</p>
+                <p class="marquee-text">ようこそ必殺社畜人のページへ！</p>
+                <p class="marquee-text">ようこそ必殺社畜人のページへ！</p>
+            </div>
+        </div>
+        <div class="dot-overlay"></div>
+    </div>
+
+    <script>
+        function updateMarqueeAnimation() {
+            const marqueeContent = document.querySelector('.marquee-content');
+            const container = document.querySelector('.marquee-container');
+            const text = document.querySelector('.marquee-text');
+            
+            // テキストの実際の幅を計算
+            const textWidth = text.offsetWidth;
+            
+            // 目標の速度（ピクセル/秒）
+            const pixelsPerSecond = 100;
+            
+            // アニメーションの持続時間を計算（テキスト1つ分の距離/速度）
+            const duration = textWidth / pixelsPerSecond;
+            
+            // キーフレームアニメーションを動的に作成
+            const keyframes = `
+                @keyframes marquee {
+                    0% { transform: translateX(0); }
+                    100% { transform: translateX(-${textWidth}px); }
+                }
+            `;
+            
+            // 既存のスタイルタグを探すか、新しく作成
+            let styleSheet = document.getElementById('marquee-style');
+            if (!styleSheet) {
+                styleSheet = document.createElement('style');
+                styleSheet.id = 'marquee-style';
+                document.head.appendChild(styleSheet);
+            }
+            
+            // スタイルを更新
+            styleSheet.textContent = keyframes;
+            marqueeContent.style.animation = `marquee ${duration}s linear infinite`;
+        }
+
+        // テキストの複製を管理する関数
+        function manageTextDuplication() {
+            const container = document.querySelector('.marquee-container');
+            const content = document.querySelector('.marquee-content');
+            const text = document.querySelector('.marquee-text');
+            const textWidth = text.offsetWidth;
+            const containerWidth = container.offsetWidth;
+            
+            // 必要な複製の数を計算（コンテナの幅をカバーするために必要な数 + 余裕を持たせる）
+            const necessaryDuplicates = Math.ceil(containerWidth / textWidth) + 2;
+            
+            // 現在の複製の数を確認
+            const currentTexts = content.children.length;
+            
+            // テキストの追加または削除
+            if (currentTexts < necessaryDuplicates) {
+                // テキストを追加
+                for (let i = currentTexts; i < necessaryDuplicates; i++) {
+                    const clone = text.cloneNode(true);
+                    content.appendChild(clone);
+                }
+            } else if (currentTexts > necessaryDuplicates) {
+                // 余分なテキストを削除
+                for (let i = currentTexts - 1; i >= necessaryDuplicates; i--) {
+                    content.children[i].remove();
+                }
+            }
+        }
+
+        // 初期化時に実行
+        manageTextDuplication();
+        updateMarqueeAnimation();
+
+        // ウィンドウサイズが変更されたときに再計算
+        window.addEventListener('resize', () => {
+            manageTextDuplication();
+            updateMarqueeAnimation();
+        });
+    </script>
+</body>
+</html>

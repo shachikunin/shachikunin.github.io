@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>インタラクティブ花火 - 減速パーティクルと二次爆発</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+        canvas {
+            display: block;
+        }
+        #sky {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to top, #001e3c, #000c1a, #000000);
+            z-index: -1;
+        }
+        .star {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+    <div id="sky"></div>
+    <canvas id="fireworksCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('fireworksCanvas');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        function createStars() {
+            const starCount = 250;
+            const sky = document.getElementById('sky');
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.width = Math.random() * 2 + 'px';
+                star.style.height = star.style.width;
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.opacity = Math.random() * 0.5 + 0.5;
+                sky.appendChild(star);
+            }
+        }
+
+        createStars();
+
+        class Firework {
+            constructor(x, y, targetY) {
+                this.x = x;
+                this.y = y;
+                this.targetY = targetY;
+                this.speed = Math.random() * 3 + 1.5;
+                this.radius = 3;
+                this.exploded = false;
+                this.particles = [];
+                this.color = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                this.explosionSize = Math.random() * 100 + 50;
+                this.explosionSpeed = Math.random() * 3 + 1.5;
+            }
+
+            update() {
+                if (!this.exploded) {
+                    this.y -= this.speed;
+                    if (this.y <= this.targetY) {
+                        this.explode();
+                    }
+                } else {
+                    this.particles.forEach(particle => particle.update());
+                    this.particles = this.particles.filter(particle => particle.alpha > 0);
+                }
+            }
+
+            draw() {
+                if (!this.exploded) {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = this.color;
+                    ctx.fill();
+
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.radius * 2, 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+                    ctx.fill();
+                } else {
+                    this.particles.forEach(particle => particle.draw());
+                }
+            }
+
+            explode() {
+                this.exploded = true;
+                for (let i = 0; i < this.explosionSize; i++) {
+                    this.particles.push(new Particle(this.x, this.y, this.color, this.explosionSpeed));
+                }
+            }
+        }
+
+        class Particle {
+            constructor(x, y, color, speed, isSecondary = false) {
+                this.x = x;
+                this.y = y;
+                this.initialX = x;
+                this.initialY = y;
+                this.radius = isSecondary ? Math.random() * 1 + 0.5 : Math.random() * 2 + 1;
+                this.speed = speed * (Math.random() + 0.5);
+                this.angle = Math.random() * Math.PI * 2;
+                this.alpha = 1;
+                this.decay = Math.random() * 0.015 + 0.005;
+                this.color = color;
+                this.isSecondary = isSecondary;
+                this.hasSecondaryExplosion = Math.random() < 0.1 && !isSecondary; // 10% chance for secondary explosion
+                this.secondaryExplosionTime = Math.random() * 0.5 + 0.3; // Secondary explosion occurs when alpha is between 0.3 and 0.8
+            }
+
+            update() {
+                const distanceFromCenter = Math.sqrt(Math.pow(this.x - this.initialX, 2) + Math.pow(this.y - this.initialY, 2));
+                const slowdownFactor = Math.max(0.1, 1 - distanceFromCenter / 200);
+
+                this.x += Math.cos(this.angle) * this.speed * slowdownFactor;
+                this.y += Math.sin(this.angle) * this.speed * slowdownFactor;
+                this.alpha -= this.decay;
+
+                if (this.hasSecondaryExplosion && this.alpha <= this.secondaryExplosionTime && this.alpha > this.secondaryExplosionTime - 0.1) {
+                    this.createSecondaryExplosion();
+                    this.hasSecondaryExplosion = false;
+                }
+            }
+
+            draw() {
+                ctx.globalAlpha = this.alpha;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius * 2, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+                ctx.fill();
+
+                ctx.globalAlpha = 1;
+            }
+
+            createSecondaryExplosion() {
+                const secondaryParticles = 10;
+                for (let i = 0; i < secondaryParticles; i++) {
+                    fireworks.push(new Particle(this.x, this.y, this.color, this.speed * 0.5, true));
+                }
+            }
+        }
+
+        let fireworks = [];
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            fireworks.forEach(firework => {
+                firework.update();
+                firework.draw();
+            });
+
+            fireworks = fireworks.filter(firework => {
+                if (firework instanceof Firework) {
+                    return firework.exploded ? firework.particles.length > 0 : true;
+                }
+                return firework.alpha > 0;
+            });
+
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+
+        canvas.addEventListener('click', (e) => {
+            const startX = e.clientX;
+            const startY = canvas.height;
+            const targetY = e.clientY;
+            fireworks.push(new Firework(startX, startY, targetY));
+        });
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+</body>
+</html>
